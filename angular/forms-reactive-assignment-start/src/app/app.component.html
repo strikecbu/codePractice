@@ -1,6 +1,68 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <div formGroupName="project">
+          <div class="form-group" >
+            <label for="projectName">
+              ProjectName:
+              <input
+                type="text"
+                class="form-control"
+                id="projectName"
+                formControlName="name"
+              >
+            </label>
+            <div class="bg-warning" *ngIf="!userForm.get('project.name').valid && userForm.get('project.name').touched">
+              <p *ngIf="userForm.get('project.name').errors?.required">Should NOT empty!</p>
+              <p *ngIf="userForm.get('project.name').errors?.forbiddenNames">This project name is NOT allow!</p>
+            </div>
+          </div>
+          <div class="form-group" >
+            <label>
+              ProjectStatus:
+              <select
+                class="form-control"
+                formControlName="status"
+              >
+                <option value=""></option>
+                <option value="Stable">Stable</option>
+                <option value="Critical">Critical</option>
+                <option value="Finished">Finished</option>
+              </select>
+            </label>
+            <div class="bg-warning" *ngIf="!userForm.get('project.status').valid && userForm.get('project.status').touched">
+              You should select a option!
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">
+            Email:
+            <input
+              type="text"
+              class="form-control"
+              id="email"
+              formControlName="email"
+            >
+          </label>
+          <div class="bg-warning" *ngIf="!userForm.get('email').valid && userForm.get('email').touched">
+            Please enter valid email address!
+          </div>
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-primary" [disabled]="!userForm.valid" >Submit</button>
+        </div>
+      </form>
+      <div *ngIf="isSubmit">
+        <h3>Your Data:</h3>
+        <div class="bg-info panel-body">
+          <p>ProjectName: {{userForm.value.project.name}}</p>
+          <p>Email: {{userForm.value.email}}</p>
+          <p>ProjectStatus: {{userForm.value.project.status}}</p>
+        </div>
+      </div>
       <!--
           Create a Form with the following Controls and Validators
           1) Project Name (should not be empty)
