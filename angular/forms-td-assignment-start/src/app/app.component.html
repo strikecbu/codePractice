@@ -1,6 +1,70 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+      <form (ngSubmit)="onSubmit(f)" #f="ngForm">
+        <div class="form-group">
+          <label for="email">
+            Email:
+            <input type="text"
+                   class="form-control"
+                   id="email"
+                   name="email"
+                   ngModel
+                   required
+                   email
+                   #email="ngModel"
+            >
+          </label>
+          <div class="text-warning" *ngIf="!email.valid && email.touched">
+            Please enter valid email!
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="project">
+            <select class="form-control"
+                    id="project"
+                    name="project"
+                    ngModel
+                    required
+            >
+              <option value=""></option>
+              <option value="Basic">Basic</option>
+              <option value="Advanced">Advanced</option>
+              <option value="Pro">Pro</option>
+            </select>
+          </label>
+          <div>
+            <button type="button" class="btn btn-default" (click)="onSuggest()">Suggestion</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="password">
+            Password:
+            <input type="password"
+                   class="form-control"
+                   id="password"
+                   name="password"
+                   ngModel
+                   required
+                   #password="ngModel"
+            >
+          </label>
+          <div class="text-warning" *ngIf="!password.valid && password.touched">
+            Password should not be empty!
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit" [disabled]="!f.valid">Submit</button>
+      </form>
+      <hr>
+      <div *ngIf="isSubmit">
+      <h3>Data you Input:</h3>
+        <div class="bg-info panel-body">
+          <p>Email: {{userData.email}}</p>
+          <p>Project: {{userData.project}}</p>
+          <p>Password: {{userData.password}}</p>
+        </div>
+      </div>
+
       <!-- Add a Form with the following Inputs (and Validators)
            1) Mail address (should not be empty and should be an email address)
            2) A Dropdown which allows the user to select from three different Subscriptions ("Basic", "Advanced", "Pro")
