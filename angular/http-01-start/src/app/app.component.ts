@@ -1,55 +1,65 @@
 import { HttpClient } from "@angular/common/http";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Post } from "./post.model";
-import { map } from "rxjs/operators";
+import { PostService } from "./post.service";
 
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.css"],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+  constructor(private http: HttpClient, private postService: PostService) {}
+  
   loadedPosts: Post[] = [];
+  isFetching = false;
+  error: string = null;
 
-  constructor(private http: HttpClient) {}
+  errorSub = this.postService.error.subscribe((error) => {
+    this.error = error;
+  });
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.onFetchPosts();
+  }
+  ngOnDestroy(): void {
+    this.errorSub.unsubscribe();
+  }
 
   onCreatePost(postData: Post) {
     // Send Http request
-    this.http
-      .post<{ name: string }>(
-        "https://angulor-http-default-rtdb.firebaseio.com/posts.json",
-        postData
-      )
-      .subscribe((responseData) => {
-        console.log(responseData);
-        this.onFetchPosts();
-      });
+    this.postService.addPostData(postData.title, postData.content);
   }
 
   onFetchPosts() {
     // Send Http request
-    this.http
-      .get<{ [key: string]: Post }>(
-        "https://angulor-http-default-rtdb.firebaseio.com/posts.json"
-      )
-      .pipe(
-        map((responseData) => {
-          const posts: Post[] = [];
-          for (let key in responseData) {
-            if (responseData.hasOwnProperty(key))
-              posts.push({ ...responseData[key], id: key });
-          }
-          return posts;
-        })
-      )
-      .subscribe((posts) => {
-        this.loadedPosts = posts;
-      });
+    this.isFetching = true;
+    this.postService.fetchPostData().subscribe(
+      (loadPosts) => {
+        this.loadedPosts = loadPosts;
+        this.isFetching = false;
+      },
+      (error) => {
+        this.error = error.message;
+        this.isFetching = false;
+      }
+    );
   }
 
   onClearPosts() {
     // Send Http request
+    this.postService.deletePost().subscribe(
+      (data) => {
+        console.log(data);
+        this.loadedPosts = [];
+      },
+      (error) => {
+        this.error = error.message;
+      }
+    );
+  }
+
+  onErrorOk() {
+    this.error = null;
   }
 }
