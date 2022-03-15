@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { catchError, tap } from "rxjs/operators";
-import { Subject, throwError } from "rxjs";
+import { BehaviorSubject, throwError } from "rxjs";
 import { User } from "./User.model";
 
 export interface signApiResponse {
@@ -17,7 +17,8 @@ export interface signApiResponse {
 export class AuthService {
   constructor(private http: HttpClient) {}
 
-  userSubj = new Subject<User>();
+  userSubj = new BehaviorSubject<User>(null);
+  duringTimeToLogoutTimer: number;
 
   signUp(email: string, password: string) {
     return this.http
@@ -47,6 +48,11 @@ export class AuthService {
 
   logout() {
     this.userSubj.next(null);
+    localStorage.removeItem("userData");
+    if (this.duringTimeToLogoutTimer) {
+      clearTimeout(this.duringTimeToLogoutTimer);
+    }
+    this.duringTimeToLogoutTimer = null;
   }
 
   authHandle(respData: signApiResponse) {
@@ -57,7 +63,34 @@ export class AuthService {
       respData.idToken,
       expiredTime
     );
+    localStorage.setItem("userData", JSON.stringify(user));
+    this.autoLogout(+respData.expiresIn * 1000);
     this.userSubj.next(user);
+  }
+
+  autoLogin() {
+    const userData: {
+      email: string;
+      id: string;
+      _token: string;
+      _expiredTime: string;
+    } = JSON.parse(localStorage.getItem("userData"));
+    if (!userData) {
+      return;
+    }
+    const user = new User(
+      userData.email,
+      userData.id,
+      userData._token,
+      new Date(userData._expiredTime)
+    );
+    this.userSubj.next(user);
+  }
+
+  autoLogout(duringTimeToLogout: number) {
+    this.duringTimeToLogoutTimer = setTimeout(() => {
+      this.logout();
+    }, duringTimeToLogout);
   }
 
   errorHandle(errorResp) {
