@@ -19,6 +19,7 @@ export function saveCourse(req: Request, res: Response) {
     setTimeout(() => {
 
         res.status(200).json(COURSES[id]);
+        // res.status(500).json({message: 'random error occurred.'});
 
     }, 2000);
 
