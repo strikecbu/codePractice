@@ -2,17 +2,13 @@ import { Ingredient } from "../../shared/ingredient.model";
 import * as ShpListActions from "./shopping-list.actions";
 import { STOP_EDIT } from "./shopping-list.actions";
 
-export type AppState = {
-  shoppingList: ShoppingListStateType;
-};
-
-export interface ShoppingListStateType {
+export interface State {
   ingredients: Ingredient[];
   editedItemIndex: number;
   editedItem: Ingredient;
 }
 
-const initState: ShoppingListStateType = {
+const initState: State = {
   ingredients: [new Ingredient("Apples", 5), new Ingredient("Tomatoes", 10)],
   editedItemIndex: -1,
   editedItem: null,
@@ -21,7 +17,7 @@ const initState: ShoppingListStateType = {
 export function shoppingListReducer(
   state = initState,
   action: ShpListActions.ShoppingListActions
-): ShoppingListStateType {
+): State {
   switch (action.type) {
     case ShpListActions.ADD_INGREDIENT:
       return {

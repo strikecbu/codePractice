@@ -1,11 +1,11 @@
-import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { NgForm } from "@angular/forms";
-import { Subscription } from "rxjs";
-import { Store } from "@ngrx/store";
+import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {NgForm} from "@angular/forms";
+import {Subscription} from "rxjs";
+import {Store} from "@ngrx/store";
 
-import { Ingredient } from "../../shared/ingredient.model";
-import { ShoppingListStateType } from "../store/shopping-list.reducer";
+import {Ingredient} from "../../shared/ingredient.model";
 import * as ShoppingListActions from "../store/shopping-list.actions";
+import * as fromApp from "../../store/app.reducer";
 
 @Component({
   selector: "app-shopping-edit",
@@ -13,13 +13,12 @@ import * as ShoppingListActions from "../store/shopping-list.actions";
   styleUrls: ["./shopping-edit.component.css"],
 })
 export class ShoppingEditComponent implements OnInit, OnDestroy {
-  @ViewChild("f", { static: false }) slForm: NgForm;
+  @ViewChild("f", {static: false}) slForm: NgForm;
   subscription: Subscription;
   editMode = false;
 
-  constructor(
-    private store: Store<{ shoppingList: ShoppingListStateType }>
-  ) {}
+  constructor(private store: Store<fromApp.AppState>) {
+  }
 
   ngOnInit() {
     this.subscription = this.store.select("shoppingList").subscribe((state) => {
@@ -54,9 +53,7 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   }
 
   onDelete() {
-    this.store.dispatch(
-      new ShoppingListActions.DeleteIngredient()
-    );
+    this.store.dispatch(new ShoppingListActions.DeleteIngredient());
     this.onClear();
   }
 
