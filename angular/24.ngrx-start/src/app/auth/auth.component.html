@@ -9,10 +9,10 @@
       *ngIf="error"
       (close)="onHandleError()"
     ></app-alert> -->
-    <div *ngIf="isLoading" style="text-align: center;">
+    <div *ngIf="(isLoading$ | async)" style="text-align: center;">
       <app-loading-spinner></app-loading-spinner>
     </div>
-    <form #authForm="ngForm" (ngSubmit)="onSubmit(authForm)" *ngIf="!isLoading">
+    <form #authForm="ngForm" (ngSubmit)="onSubmit(authForm)" *ngIf="!(isLoading$ | async)">
       <div class="form-group">
         <label for="email">E-Mail</label>
         <input
