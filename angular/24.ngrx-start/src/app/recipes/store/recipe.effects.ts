@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {Store} from "@ngrx/store";
-import {catchError, map, switchMap, take} from "rxjs/operators";
+import {catchError, map, switchMap, take, withLatestFrom} from "rxjs/operators";
 import {HttpClient} from "@angular/common/http";
 import {of} from "rxjs";
 
@@ -15,18 +15,25 @@ export class RecipeEffects {
     () => {
       return this.actions$.pipe(
         ofType(RecipeActions.START_STORE_RECIPES),
-        switchMap(() => {
-          return this.store.select("recipe").pipe(
-            take(1),
-            map((state) => state.recipes),
-            switchMap((recipes) => {
-              return this.http.put(
-                "https://angular-http2-3d5ab-default-rtdb.asia-southeast1.firebasedatabase.app/recipes.json",
-                recipes
-              );
-            })
+        withLatestFrom(this.store.select("recipe")),
+        switchMap(([action, recipeState]) => {
+          return this.http.put(
+            "https://angular-http2-3d5ab-default-rtdb.asia-southeast1.firebasedatabase.app/recipes.json",
+            recipeState.recipes
           );
-        })
+        }),
+        // switchMap(() => {
+        //   return this.store.select("recipe").pipe(
+        //     take(1),
+        //     map((state) => state.recipes),
+        //     switchMap((recipes) => {
+        //       return this.http.put(
+        //         "https://angular-http2-3d5ab-default-rtdb.asia-southeast1.firebasedatabase.app/recipes.json",
+        //         recipes
+        //       );
+        //     })
+        //   );
+        // })
       );
     },
     {dispatch: false}

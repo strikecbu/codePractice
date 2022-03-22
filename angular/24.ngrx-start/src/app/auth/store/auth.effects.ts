@@ -8,6 +8,7 @@ import { of } from "rxjs";
 import { Router } from "@angular/router";
 import { User } from "../user.model";
 import { AuthService } from "../auth.service";
+import {AuthenticationSuccess} from "./auth.actions";
 
 export interface AuthResponseData {
   kind: string;
@@ -92,8 +93,10 @@ export class AuthEffects {
     () => {
       return this.actions$.pipe(
         ofType(AuthActions.AUTHENTICATION_SUCCESS),
-        tap(() => {
-          this.router.navigate(["/"]);
+        tap((action: AuthenticationSuccess) => {
+          if (action.payload.isRedirect) {
+            this.router.navigate(["/"]);
+          }
         })
       );
     },
@@ -142,6 +145,7 @@ export class AuthEffects {
             userId: userData.id,
             token: userData._token,
             expirationDate: new Date(userData._tokenExpirationDate),
+            isRedirect: false
           });
         }
         return { type: "NOT_EXIST" };
@@ -164,6 +168,7 @@ export class AuthEffects {
       userId,
       token,
       expirationDate: expirationDate,
+      isRedirect: true
     });
   };
 
