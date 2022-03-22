@@ -18,45 +18,45 @@ export class DataStorageService {
     private store: Store<AppState>
   ) {}
 
-  storeRecipes() {
-    let recipes;
-    this.store
-      .select("recipe")
-      .pipe(
-        take(1),
-        map((state) => state.recipes)
-      )
-      .subscribe((recs) => {
-        recipes = recs;
-      });
-    this.http
-      .put(
-        "https://angular-http2-3d5ab-default-rtdb.asia-southeast1.firebasedatabase.app/recipes.json",
-        recipes
-      )
-      .subscribe((response) => {
-        console.log(response);
-      });
-  }
+  // storeRecipes() {
+  //   let recipes;
+  //   this.store
+  //     .select("recipe")
+  //     .pipe(
+  //       take(1),
+  //       map((state) => state.recipes)
+  //     )
+  //     .subscribe((recs) => {
+  //       recipes = recs;
+  //     });
+  //   this.http
+  //     .put(
+  //       "https://angular-http2-3d5ab-default-rtdb.asia-southeast1.firebasedatabase.app/recipes.json",
+  //       recipes
+  //     )
+  //     .subscribe((response) => {
+  //       console.log(response);
+  //     });
+  // }
 
-  fetchRecipes() {
-    return this.http
-      .get<Recipe[]>(
-        "https://angular-http2-3d5ab-default-rtdb.asia-southeast1.firebasedatabase.app/recipes.json"
-      )
-      .pipe(
-        map((recipes) => {
-          return recipes.map((recipe) => {
-            return {
-              ...recipe,
-              ingredients: recipe.ingredients ? recipe.ingredients : [],
-            };
-          });
-        }),
-        tap((recipes) => {
-          this.store.dispatch(new RecipeActions.SetRecipes(recipes));
-          // this.recipeService.setRecipes(recipes);
-        })
-      );
-  }
+  // fetchRecipes() {
+  //   return this.http
+  //     .get<Recipe[]>(
+  //       "https://angular-http2-3d5ab-default-rtdb.asia-southeast1.firebasedatabase.app/recipes.json"
+  //     )
+  //     .pipe(
+  //       map((recipes) => {
+  //         return recipes.map((recipe) => {
+  //           return {
+  //             ...recipe,
+  //             ingredients: recipe.ingredients ? recipe.ingredients : [],
+  //           };
+  //         });
+  //       }),
+  //       tap((recipes) => {
+  //         this.store.dispatch(new RecipeActions.SetRecipes(recipes));
+  //         // this.recipeService.setRecipes(recipes);
+  //       })
+  //     );
+  // }
 }

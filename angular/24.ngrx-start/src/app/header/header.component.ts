@@ -6,6 +6,7 @@ import { map } from "rxjs/operators";
 import * as fromApp from "../store/app.reducer";
 import { DataStorageService } from "../shared/data-storage.service";
 import {Logout} from "../auth/store/auth.actions";
+import {StartFetchRecipes, StartStoreRecipes} from "../recipes/store/recipe.actions";
 
 
 @Component({
@@ -33,11 +34,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onSaveData() {
-    this.dataStorageService.storeRecipes();
+    // this.dataStorageService.storeRecipes();
+    this.store.dispatch(new StartStoreRecipes());
   }
 
   onFetchData() {
-    this.dataStorageService.fetchRecipes().subscribe();
+    this.store.dispatch(new StartFetchRecipes());
+    // this.dataStorageService.fetchRecipes().subscribe();
   }
 
   onLogout() {
