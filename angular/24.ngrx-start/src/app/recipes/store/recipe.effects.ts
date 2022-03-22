@@ -1,13 +1,13 @@
-import { Injectable } from "@angular/core";
-import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { Store } from "@ngrx/store";
-import { catchError, map, switchMap, take } from "rxjs/operators";
-import { HttpClient } from "@angular/common/http";
-import { of } from "rxjs";
+import {Injectable} from "@angular/core";
+import {Actions, createEffect, ofType} from "@ngrx/effects";
+import {Store} from "@ngrx/store";
+import {catchError, map, switchMap, take} from "rxjs/operators";
+import {HttpClient} from "@angular/common/http";
+import {of} from "rxjs";
 
 import * as RecipeActions from "./recipe.actions";
-import { AppState } from "../../store/app.reducer";
-import { Recipe } from "../recipe.model";
+import {AppState} from "../../store/app.reducer";
+import {Recipe} from "../recipe.model";
 
 @Injectable()
 export class RecipeEffects {
@@ -29,7 +29,7 @@ export class RecipeEffects {
         })
       );
     },
-    { dispatch: false }
+    {dispatch: false}
   );
 
   fetchRecipes$ = createEffect(() => {
@@ -43,10 +43,18 @@ export class RecipeEffects {
           .pipe(
             take(1),
             map((recipes) => {
+              return recipes.map((recipe) => {
+                return {
+                  ...recipe,
+                  ingredients: recipe.ingredients ? recipe.ingredients : [],
+                };
+              });
+            }),
+            map((recipes) => {
               return new RecipeActions.SetRecipes(recipes);
             }),
             catchError((error) => {
-              return of({ type: "NOT_EXIST" });
+              return of({type: "NOT_EXIST"});
             })
           );
       })
@@ -57,5 +65,6 @@ export class RecipeEffects {
     private actions$: Actions,
     private http: HttpClient,
     private store: Store<AppState>
-  ) {}
+  ) {
+  }
 }
