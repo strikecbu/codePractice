@@ -14,8 +14,9 @@
           <button class="btn btn-primary" (click)="onSuggestName()">SuggestName</button>
           <div class="alert-danger"
                *ngIf="!userDataForm.get('userData.username').valid && userDataForm.get('userData.username').touched">
-            <span *ngIf="userDataForm.get('userData.username').errors['nameIsForbidden']">Username is not valid!</span>
+            <span *ngIf="userDataForm.get('userData.username').hasError('nameIsForbidden')">Username is not valid!</span>
             <span *ngIf="userDataForm.get('userData.username').errors['required']">username is required!</span>
+            <!--   上面第二種寫法新的ts會報錯   -->
           </div>
           <div class="form-group">
             <label for="email">email</label>
