@@ -1,6 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import {
+  AbstractControl,
+  FormArray,
+  FormControl,
+  FormGroup,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { delay, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +21,8 @@ export class AppComponent implements OnInit {
   forbiddenNames = ['Test', 'Choco'];
   userDataForm: FormGroup;
   timer: number;
+
+  constructor(private httpClient: HttpClient) {}
 
   ngOnInit(): void {
     this.userDataForm = new FormGroup({
@@ -66,6 +77,29 @@ export class AppComponent implements OnInit {
         }
       }, 1500);
     });
+  }
+
+  // sample use http to validate
+  serverValidateElectricNo(
+    control: AbstractControl
+  ): Observable<ValidationErrors | null> {
+    const url = 'http://localhost:8014/mgrfunc14/utystep4handler/submitData';
+
+    return of(control.value).pipe(
+      delay(300),
+      switchMap((value) => {
+        console.log('let go validate');
+        const params = new HttpParams().set('ELECTRIC_NO', value);
+        return this.httpClient.post<{ faliColumn: string }>(url, params, {});
+      }),
+      switchMap((resp) => {
+        if (resp.faliColumn) {
+          console.log('bad value');
+          return of({ electricNoNotCorrect: true });
+        }
+        return of(null);
+      })
+    );
   }
 
   onSuggestName() {
