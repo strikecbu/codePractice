@@ -4,14 +4,16 @@ import { Course } from '../model/course';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment';
 import { CourseService } from '../services/course.service';
-import { take } from 'rxjs/operators';
+import { catchError, map, retry, retryWhen, take } from 'rxjs/operators';
 import { LoadingService } from '../loading/loading.service';
+import { MessagesService } from '../messages/messages.service';
+import { throwError, timer } from 'rxjs';
 
 @Component({
   selector: 'course-dialog',
   templateUrl: './course-dialog.component.html',
   styleUrls: ['./course-dialog.component.css'],
-  providers: [LoadingService],
+  providers: [LoadingService, MessagesService],
 })
 export class CourseDialogComponent implements AfterViewInit {
   form: FormGroup;
@@ -23,7 +25,8 @@ export class CourseDialogComponent implements AfterViewInit {
     private dialogRef: MatDialogRef<CourseDialogComponent>,
     @Inject(MAT_DIALOG_DATA) course: Course,
     private courseService: CourseService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private messageService: MessagesService
   ) {
     this.course = course;
 
@@ -44,7 +47,13 @@ export class CourseDialogComponent implements AfterViewInit {
 
     this.loadingService
       .loadingUntilCompleted(saveCourse$)
-      .pipe(take(1))
+      .pipe(
+        retry(1),
+        catchError((err) => {
+          this.messageService.showErrors("Can't save course right now.");
+          return throwError(err);
+        })
+      )
       .subscribe((value) => {
         this.dialogRef.close(true);
       });
