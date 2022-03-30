@@ -8,12 +8,12 @@ import { catchError, map, retry, retryWhen, take } from 'rxjs/operators';
 import { LoadingService } from '../loading/loading.service';
 import { MessagesService } from '../messages/messages.service';
 import { throwError, timer } from 'rxjs';
+import { CourseStore } from '../services/course.store';
 
 @Component({
   selector: 'course-dialog',
   templateUrl: './course-dialog.component.html',
   styleUrls: ['./course-dialog.component.css'],
-  providers: [LoadingService, MessagesService],
 })
 export class CourseDialogComponent implements AfterViewInit {
   form: FormGroup;
@@ -26,7 +26,8 @@ export class CourseDialogComponent implements AfterViewInit {
     @Inject(MAT_DIALOG_DATA) course: Course,
     private courseService: CourseService,
     private loadingService: LoadingService,
-    private messageService: MessagesService
+    private messageService: MessagesService,
+    private courseStore: CourseStore
   ) {
     this.course = course;
 
@@ -41,22 +42,9 @@ export class CourseDialogComponent implements AfterViewInit {
   ngAfterViewInit() {}
 
   save() {
-    this.loadingService.onLoading();
     const changes = this.form.value;
-    const saveCourse$ = this.courseService.saveCourse(this.course.id, changes);
-
-    this.loadingService
-      .loadingUntilCompleted(saveCourse$)
-      .pipe(
-        retry(1),
-        catchError((err) => {
-          this.messageService.showErrors("Can't save course right now.");
-          return throwError(err);
-        })
-      )
-      .subscribe((value) => {
-        this.dialogRef.close(true);
-      });
+    this.courseStore.saveCourse(this.course.id, changes).subscribe();
+    this.dialogRef.close(true);
   }
 
   close() {
