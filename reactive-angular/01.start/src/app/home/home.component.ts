@@ -3,7 +3,6 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { Course, sortCoursesBySeqNo } from '../model/course';
-import { CourseDialogComponent } from '../course-dialog/course-dialog.component';
 import { CourseService } from '../services/course.service';
 
 @Component({
@@ -16,10 +15,7 @@ export class HomeComponent implements OnInit {
 
   advancedCourses$: Observable<Course[]>;
 
-  constructor(
-    private dialog: MatDialog,
-    private courseService: CourseService
-  ) {}
+  constructor(private courseService: CourseService) {}
 
   ngOnInit() {
     const courses$ = this.courseService.getAllCourses().pipe(
@@ -38,17 +34,5 @@ export class HomeComponent implements OnInit {
         return courses.filter((course) => course.category === 'ADVANCED');
       })
     );
-  }
-
-  editCourse(course: Course) {
-    const dialogConfig = new MatDialogConfig();
-
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = true;
-    dialogConfig.width = '400px';
-
-    dialogConfig.data = course;
-
-    const dialogRef = this.dialog.open(CourseDialogComponent, dialogConfig);
   }
 }
