@@ -1,19 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Course, sortCoursesBySeqNo } from '../model/course';
-import { interval, noop, Observable, of, throwError, timer } from 'rxjs';
-import {
-  catchError,
-  delay,
-  delayWhen,
-  filter,
-  finalize,
-  map,
-  retryWhen,
-  shareReplay,
-  tap,
-} from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
+import { Course } from '../model/course';
 import { CourseDialogComponent } from '../course-dialog/course-dialog.component';
 import { CourseService } from '../services/course.service';
 
@@ -28,15 +17,12 @@ export class HomeComponent implements OnInit {
   advancedCourses$: Observable<Course[]>;
 
   constructor(
-    private http: HttpClient,
     private dialog: MatDialog,
     private courseService: CourseService
   ) {}
 
   ngOnInit() {
-    const courses$ = this.courseService.getAllCourses().pipe(
-      shareReplay(1)
-    );
+    const courses$ = this.courseService.getAllCourses().pipe(shareReplay(1));
     this.beginnerCourses$ = courses$.pipe(
       map((courses) => {
         return courses.filter((course) => course.category === 'BEGINNER');
