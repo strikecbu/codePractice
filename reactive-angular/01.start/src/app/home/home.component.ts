@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Course, sortCoursesBySeqNo } from '../model/course';
 import { CourseService } from '../services/course.service';
+import { LoadingService } from '../loading/loading.service';
 
 @Component({
   selector: 'home',
@@ -15,7 +15,10 @@ export class HomeComponent implements OnInit {
 
   advancedCourses$: Observable<Course[]>;
 
-  constructor(private courseService: CourseService) {}
+  constructor(
+    private courseService: CourseService,
+    private loadingService: LoadingService
+  ) {}
 
   ngOnInit() {
     this.reloadCourses();
@@ -23,17 +26,18 @@ export class HomeComponent implements OnInit {
 
   reloadCourses() {
     const courses$ = this.courseService.getAllCourses().pipe(
-      shareReplay(1),
       map((courses) => {
         return courses.sort(sortCoursesBySeqNo);
       })
     );
-    this.beginnerCourses$ = courses$.pipe(
+    const loadingCourses$ = this.loadingService.loadingUntilCompleted(courses$);
+
+    this.beginnerCourses$ = loadingCourses$.pipe(
       map((courses) => {
         return courses.filter((course) => course.category === 'BEGINNER');
       })
     );
-    this.advancedCourses$ = courses$.pipe(
+    this.advancedCourses$ = loadingCourses$.pipe(
       map((courses) => {
         return courses.filter((course) => course.category === 'ADVANCED');
       })

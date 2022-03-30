@@ -1,1 +1,3 @@
-
+<div class="spinner-container" *ngIf="this.loadingService.loadingObs$ | async">
+    <mat-spinner></mat-spinner>
+</div>

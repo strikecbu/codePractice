@@ -10,6 +10,7 @@ export class CourseService {
 
   getAllCourses(): Observable<Course[]> {
     return this.http.get('/api/courses').pipe(
+      shareReplay(1),
       map((resp) => {
         return resp['payload'];
       })
