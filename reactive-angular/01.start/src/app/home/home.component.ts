@@ -18,6 +18,10 @@ export class HomeComponent implements OnInit {
   constructor(private courseService: CourseService) {}
 
   ngOnInit() {
+    this.reloadCourses();
+  }
+
+  reloadCourses() {
     const courses$ = this.courseService.getAllCourses().pipe(
       shareReplay(1),
       map((courses) => {

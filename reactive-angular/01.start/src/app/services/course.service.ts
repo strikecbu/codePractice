@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 import { Course } from '../model/course';
 
 @Injectable({ providedIn: 'root' })
@@ -12,7 +12,11 @@ export class CourseService {
     return this.http.get('/api/courses').pipe(
       map((resp) => {
         return resp['payload'];
-      }),
+      })
     );
+  }
+
+  saveCourse(courseId: string, value: Partial<Course>): Observable<any> {
+    return this.http.put(`/api/courses/${courseId}`, value).pipe(shareReplay());
   }
 }
