@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { Course } from '../model/course';
+import { Course, sortCoursesBySeqNo } from '../model/course';
 import { CourseDialogComponent } from '../course-dialog/course-dialog.component';
 import { CourseService } from '../services/course.service';
 
@@ -22,7 +22,12 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const courses$ = this.courseService.getAllCourses().pipe(shareReplay(1));
+    const courses$ = this.courseService.getAllCourses().pipe(
+      shareReplay(1),
+      map((courses) => {
+        return courses.sort(sortCoursesBySeqNo);
+      })
+    );
     this.beginnerCourses$ = courses$.pipe(
       map((courses) => {
         return courses.filter((course) => course.category === 'BEGINNER');
