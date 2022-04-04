@@ -1,0 +1,5 @@
+<div class="list">
+  <p>{{ (recipe$ | async)?.name }}</p>
+  <img [src]="(recipe$ | async)?.imagePath" />
+  <p>{{ (recipe$ | async)?.description }}</p>
+</div>

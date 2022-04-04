@@ -1,0 +1,10 @@
+<div class="list">
+  <a routerLink="/">Go Home</a>
+  <h3>Recipe list:</h3>
+  <div *ngFor="let recipe of recipes$ | async">
+    <a routerLinkActive="active" [routerLink]="recipe.name">{{
+      recipe.name
+    }}</a>
+  </div>
+  <router-outlet></router-outlet>
+</div>
