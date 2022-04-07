@@ -1,12 +1,12 @@
 <template>
-  <form>
+  <form @submit.prevent="onSubmit">
     <div class="form-control">
       <label for="user-name">Your Name</label>
-      <input id="user-name" name="user-name" type="text" />
+      <input id="user-name" name="user-name" type="text"/>
     </div>
     <div class="form-control">
       <label for="age">Your Age (Years)</label>
-      <input id="age" name="age" type="number" />
+      <input id="age" name="age" type="number"/>
     </div>
     <div class="form-control">
       <label for="referrer">How did you hear about us?</label>
@@ -19,38 +19,95 @@
     <div class="form-control">
       <h2>What are you interested in?</h2>
       <div>
-        <input id="interest-news" name="interest" type="checkbox" />
+        <input id="interest-news"
+               name="interest"
+               value="news"
+               type="checkbox"
+               v-model="interest"
+        />
         <label for="interest-news">News</label>
       </div>
       <div>
-        <input id="interest-tutorials" name="interest" type="checkbox" />
+        <input id="interest-tutorials"
+               name="interest"
+               value="tutorials"
+               type="checkbox"
+               v-model="interest"
+        />
         <label for="interest-tutorials">Tutorials</label>
       </div>
       <div>
-        <input id="interest-nothing" name="interest" type="checkbox" />
+        <input id="interest-nothing"
+               name="interest"
+               value="nothing"
+               type="checkbox"
+               v-model="interest"
+        />
         <label for="interest-nothing">Nothing</label>
       </div>
     </div>
     <div class="form-control">
       <h2>How do you learn?</h2>
       <div>
-        <input id="how-video" name="how" type="radio" />
+        <input id="how-video"
+               name="how"
+               value="video"
+               type="radio"
+               v-model="how"
+        />
         <label for="how-video">Video Courses</label>
       </div>
       <div>
-        <input id="how-blogs" name="how" type="radio" />
+        <input id="how-blogs"
+               name="how"
+               value="blogs"
+               type="radio"
+               v-model="how"
+        />
         <label for="how-blogs">Blogs</label>
       </div>
       <div>
-        <input id="how-other" name="how" type="radio" />
+        <input id="how-other"
+               name="how"
+               value="other"
+               type="radio"
+               v-model="how"
+        />
         <label for="how-other">Other</label>
       </div>
     </div>
+    <div class="form-control">
+      <h2>Rating score</h2>
+      <rate-score v-model="rate"></rate-score>
+    </div>
     <div>
-      <button>Save Data</button>
+      <button type="submit">Save Data</button>
     </div>
   </form>
 </template>
+<script>
+import RateScore from './RateScore.vue'
+export default {
+  components: {RateScore},
+  data() {
+    return {
+      interest: [],
+      how: null,
+      rate: null
+    }
+  },
+  methods: {
+    onSubmit() {
+      console.log(`Interest: ${this.interest}`);
+      this.interest = [];
+      console.log(`How to learn: ${this.how}`);
+      this.how = null;
+      console.log(`Rate: ${this.rate}`);
+      this.rate = null;
+    }
+  }
+}
+</script>
 
 <style scoped>
 form {
