@@ -12,8 +12,9 @@
 
 <script>
 import BaseCard from "./BaseCard.vue";
+import BaseBadge from "./BaseBadge.vue";
 export default {
-  components: { BaseCard },
+  components: { BaseCard, BaseBadge },
   props: ["fullName", "infoText", "role"],
 };
 </script>

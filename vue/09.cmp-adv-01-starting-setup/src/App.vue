@@ -7,6 +7,11 @@
       :info-text="activeUser.description"
       :role="activeUser.role"
     ></user-info>
+    <button @click="selectCoponent('main-course')">main course</button>
+    <button @click="selectCoponent('sub-course')">sub course</button>
+    <keep-alive>
+      <component :is="selectedComponent"></component>
+    </keep-alive>
   </div>
 </template>
 
@@ -14,21 +19,31 @@
 import TheHeader from "./components/TheHeader.vue";
 import BadgeList from "./components/BadgeList.vue";
 import UserInfo from "./components/UserInfo.vue";
+import MainCourse from "./components/MainCourse.vue";
+import SubCourse from "./components/SubCourse.vue";
 
 export default {
   components: {
     TheHeader,
     BadgeList,
     UserInfo,
+    MainCourse,
+    SubCourse,
   },
   data() {
     return {
+      selectedComponent: "",
       activeUser: {
         name: "Maximilian Schwarzmüller",
         description: "Site owner and admin",
         role: "admin",
       },
     };
+  },
+  methods: {
+    selectCoponent(comp) {
+      this.selectedComponent = comp;
+    },
   },
 };
 </script>
