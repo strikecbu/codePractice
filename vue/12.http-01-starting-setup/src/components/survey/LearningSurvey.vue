@@ -29,9 +29,11 @@
         <p
           v-if="invalidInput"
         >One or more input fields are invalid. Please check your provided data.</p>
+        <p v-if="error">{{error}}</p>
         <div>
           <base-button>Submit</base-button>
         </div>
+
       </form>
     </base-card>
   </section>
@@ -44,9 +46,9 @@ export default {
       enteredName: '',
       chosenRating: null,
       invalidInput: false,
+      error: null,
     };
   },
-  emits: ['survey-submit'],
   methods: {
     submitSurvey() {
       if (this.enteredName === '' || !this.chosenRating) {
@@ -55,10 +57,30 @@ export default {
       }
       this.invalidInput = false;
 
-      this.$emit('survey-submit', {
-        userName: this.enteredName,
-        rating: this.chosenRating,
-      });
+      const url = 'https://vue-http-bbb10-default-rtdb.asia-southeast1.firebasedatabase.app/surveys.json'
+      fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          name: this.enteredName,
+          rating: this.chosenRating,
+        }),
+        headers: {
+          'content-type': 'application/json'
+        }
+      }).then((data) => {
+        return data.json()
+      }).then((data) => {
+        this.error = null;
+        console.log(data)
+      }).catch(error => {
+        this.error = 'Fail to save survey. Please try again later!'
+        console.log(error)
+      })
+
+      // this.$emit('survey-submit', {
+      //   userName: this.enteredName,
+      //   rating: this.chosenRating,
+      // });
 
       this.enteredName = '';
       this.chosenRating = null;

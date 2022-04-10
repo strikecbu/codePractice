@@ -1,5 +1,5 @@
 <template>
-  <learning-survey @survey-submit="storeSurvey"></learning-survey>
+  <learning-survey ></learning-survey>
   <user-experiences :results="savedSurveyResults"></user-experiences>
 </template>
 
@@ -18,15 +18,30 @@ export default {
     };
   },
   methods: {
-    storeSurvey(surveyData) {
-      const surveyResult = {
-        name: surveyData.userName,
-        rating: surveyData.rating,
-        id: new Date().toISOString(),
-      };
-      this.savedSurveyResults.push(surveyResult);
-      console.log(surveyResult);
-    },
+    // storeSurvey(surveyData) {
+    //   const surveyResult = {
+    //     name: surveyData.userName,
+    //     rating: surveyData.rating,
+    //   };
+    //
+    //   const url = 'https://vue-http-bbb10-default-rtdb.asia-southeast1.firebasedatabase.app/surveys.json'
+    //   fetch(url, {
+    //     method: 'POST',
+    //     body: JSON.stringify(surveyResult),
+    //     headers: {
+    //       'content-type': 'application/json'
+    //     }
+    //   }).then((data) => {
+    //     return data.json()
+    //   }).then((data) => {
+    //     console.log(data)
+    //     surveyResult.id = data.name;
+    //     this.savedSurveyResults.push(surveyResult);
+    //   }).catch(error => {
+    //     console.log(error)
+    //   })
+    //   console.log(surveyResult);
+    // },
   },
 };
 </script>
