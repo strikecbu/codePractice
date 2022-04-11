@@ -20,6 +20,7 @@ export default {
   components: {
     UserItem
   },
+  props: ['teamId'],
   data() {
     return {
       teamName: '',
@@ -30,8 +31,7 @@ export default {
     goTeam2() {
       this.$router.push('/teams/t2');
     },
-    loadTeamInformation(route) {
-      const teamId = route.params.id;
+    loadTeamInformation(teamId) {
       const team = this.teams.find(team => team.id === teamId);
       if (!team) {
         return
@@ -41,11 +41,11 @@ export default {
     }
   },
   created() {
-    this.loadTeamInformation(this.$route)
+    this.loadTeamInformation(this.teamId)
   },
   watch: {
-    $route(newRoute) {
-      this.loadTeamInformation(newRoute)
+    teamId(newTeamId) {
+      this.loadTeamInformation(newTeamId)
     }
   },
   inject: ['teams', 'users']
