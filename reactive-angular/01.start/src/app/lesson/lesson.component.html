@@ -1,1 +1,9 @@
-<p>lesson works!</p>
+<h2>{{lesson.description}}</h2>
+<h4>{{lesson.duration}}</h4>
+<button mat-raised-button color="primary" (click)="backSearch()">
+    <mat-icon>arrow_back</mat-icon>
+    GoBack
+</button>
+<iframe width="390" height="230" allowfullscreen style="margin-top: 5px"
+        [src]="('https://www.youtube.com/embed/' + lesson.videoId) | safeUrl"
+></iframe>
