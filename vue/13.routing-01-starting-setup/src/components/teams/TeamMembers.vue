@@ -3,12 +3,13 @@
     <h2>{{ teamName }}</h2>
     <ul>
       <user-item
-        v-for="member in members"
-        :key="member.id"
-        :name="member.fullName"
-        :role="member.role"
+          v-for="member in members"
+          :key="member.id"
+          :name="member.fullName"
+          :role="member.role"
       ></user-item>
     </ul>
+    <button @click="goTeam2">Go to team2</button>
   </section>
 </template>
 
@@ -21,13 +22,33 @@ export default {
   },
   data() {
     return {
-      teamName: 'Test',
-      members: [
-        { id: 'u1', fullName: 'Max Schwarz', role: 'Engineer' },
-        { id: 'u2', fullName: 'Max Schwarz', role: 'Engineer' },
-      ],
+      teamName: '',
+      members: [],
     };
   },
+  methods: {
+    goTeam2() {
+      this.$router.push('/teams/t2');
+    },
+    loadTeamInformation(route) {
+      const teamId = route.params.id;
+      const team = this.teams.find(team => team.id === teamId);
+      if (!team) {
+        return
+      }
+      this.teamName = team.name
+      this.members = this.users.filter(user => team.members.includes(user.id))
+    }
+  },
+  created() {
+    this.loadTeamInformation(this.$route)
+  },
+  watch: {
+    $route(newRoute) {
+      this.loadTeamInformation(newRoute)
+    }
+  },
+  inject: ['teams', 'users']
 };
 </script>
 
