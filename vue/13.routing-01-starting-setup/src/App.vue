@@ -3,6 +3,7 @@
   <main>
     <button @click="changePage">confirm</button>
     <router-view></router-view>
+    <router-view name="footer"></router-view>
   </main>
 </template>
 
