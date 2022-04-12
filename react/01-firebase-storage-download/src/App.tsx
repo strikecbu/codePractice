@@ -2,6 +2,7 @@ import {FormEvent, useContext, useRef} from 'react';
 import './App.css';
 import Download from './components/Download';
 import iisiLogo from './logo_iisi.png';
+import logo from './logo.svg';
 
 import {AppContext} from './store/AppContext';
 
@@ -21,7 +22,7 @@ function App() {
     return (
         <div className="App">
             <header className="App-header">
-                {/* <img src={logo} className="App-logo" alt="logo" /> */}
+                 {/*<img src={logo} className="App-logo" alt="logo" />*/}
                 <img src={iisiLogo} className="" alt="iisiLogo"/>
                 {ctx.isLoggedIn && <Download word="IISI unzip tool"></Download>}
                 {!ctx.isLoggedIn && (
