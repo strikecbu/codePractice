@@ -1,7 +1,7 @@
 <template>
   <li>
     <div>
-      <img :src="image" :alt="title" />
+      <img :src="image" :alt="title"/>
     </div>
     <div>
       <h3>{{ title }}</h3>
@@ -22,8 +22,9 @@
 </template>
 
 <script>
+import {mapActions} from "vuex";
+
 export default {
-  inject: ['removeProductFromCart'],
   props: ['prodId', 'title', 'image', 'price', 'qty'],
   computed: {
     itemTotal() {
@@ -32,8 +33,9 @@ export default {
   },
   methods: {
     remove() {
-      this.removeProductFromCart(this.prodId);
-    }
+      this.removeProductFromCart({prodId: this.prodId});
+    },
+    ...mapActions('cart', ['removeProductFromCart'])
   }
 };
 </script>

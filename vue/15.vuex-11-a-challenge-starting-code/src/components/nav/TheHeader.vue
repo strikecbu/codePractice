@@ -10,7 +10,7 @@
         </li>
         <li>
           <router-link to="/cart">Cart</router-link>
-          <base-badge mode="elegant">{{ cart.qty }}</base-badge>
+          <base-badge mode="elegant">{{ totalQuantity }}</base-badge>
         </li>
         <li v-if="isAuthentication">
           <router-link to="/admin">Admin</router-link>
@@ -28,13 +28,13 @@
 import {mapActions, mapGetters} from "vuex";
 
 export default {
-  inject: ['cart'],
   computed: {
-    ...mapGetters('auth', ['isAuthentication'])
+    ...mapGetters('auth', ['isAuthentication']),
+    ...mapGetters('cart', ['totalQuantity'])
   },
   methods: {
     ...mapActions('auth', ['login', "logout"])
-  }
+  },
 };
 </script>
 
