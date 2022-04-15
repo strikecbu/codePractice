@@ -12,7 +12,7 @@ export default {
   },
   data() {
     return {
-      isLoggedIn: false,
+      // isLoggedIn: false,
       products: [
         {
           id: 'p1',
@@ -46,7 +46,7 @@ export default {
   },
   provide() {
     return {
-      isLoggedIn: this.isLoggedIn,
+      // isLoggedIn: this.isLoggedIn,
       products: this.products,
       cart: this.cart,
       addProductToCart: this.addProductToCart,
