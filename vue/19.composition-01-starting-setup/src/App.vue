@@ -1,16 +1,30 @@
 <template>
   <section class="container">
-    <h2>{{ userName }}</h2>
+    <h2>{{ user.userName }}</h2>
+    <h2>{{ user.userAge }}</h2>
+    <button @click="changeAge">ChangeAge</button>
   </section>
 </template>
 
 <script>
+import {reactive} from "vue";
+
 export default {
-  data() {
-    return {
-      userName: 'Maximilian',
-    };
-  },
+  setup() {
+    const user = reactive({
+      userName: 'Andy',
+      userAge: 34
+    })
+    function changeAge() {
+      user.userAge = 18
+    }
+    return {user, changeAge}
+  }
+  // data() {
+  //   return {
+  //     userName: 'Maximilian',
+  //   };
+  // },
 };
 </script>
 
