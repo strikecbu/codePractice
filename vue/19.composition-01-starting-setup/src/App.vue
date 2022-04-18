@@ -1,20 +1,32 @@
 <template>
   <section class="container">
-    <h2>{{ fullName }}</h2>
-    <h2>{{ user.userAge }}</h2>
-    <h3>{{ user.userName }}</h3>
+    <data-view
+      :firstName="firstName"
+      :lastName="lastName"
+      :phoneNum="phoneNum"
+      :userName="user.userName"
+    ></data-view>
+
+
     <button @click="changeAge">ChangeAge</button>
     <div>
       <input type="text" @input="setFirstName" />
-      <input type="text" @input="setLastName" />
+      <input type="text" v-model="lastName" />
+    </div>
+    <div>
+      <label for="phone">Phone:</label>
+      <input id="phone" type="text" ref="phoneRef" />
+      <br />
+      <button @click="changePhone">Change Phone</button>
     </div>
   </section>
 </template>
 
 <script>
-import { computed, reactive, ref, watch } from 'vue';
-
+import { computed, provide, reactive, ref, watch } from 'vue';
+import DataView from './components/DataView.vue';
 export default {
+  components: { DataView },
   setup() {
     const user = reactive({
       userName: 'Andy',
@@ -22,6 +34,15 @@ export default {
     });
     const firstName = ref('');
     const lastName = ref('');
+    const phoneRef = ref(null);
+    const phoneNum = ref('');
+
+    const userAge = computed(() => {
+      return user.userAge;
+    })
+
+    provide('userAge', userAge);
+
     function changeAge() {
       user.userAge = 18;
     }
@@ -29,18 +50,34 @@ export default {
     const setFirstName = (event) => {
       firstName.value = event.target.value;
     };
-    const setLastName = (event) => {
-      lastName.value = event.target.value;
-    };
+    // const setLastName = (event) => {
+    //   lastName.value = event.target.value;
+    // };
+
+    function changePhone() {
+      phoneNum.value = phoneRef.value.value;
+    }
 
     const fullName = computed(() => {
       return firstName.value + ' ' + lastName.value;
     });
 
     watch(fullName, (value) => {
-      user.userName = value
-    })
-    return { user, changeAge, setFirstName, setLastName, fullName };
+      user.userName = value;
+    });
+
+    provide();
+    return {
+      user,
+      firstName,
+      lastName,
+      changeAge,
+      setFirstName,
+      changePhone,
+      fullName,
+      phoneRef,
+      phoneNum,
+    };
   },
   // data() {
   //   return {
