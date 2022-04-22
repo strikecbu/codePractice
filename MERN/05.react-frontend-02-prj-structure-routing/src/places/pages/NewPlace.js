@@ -1,37 +1,17 @@
-import React, { useCallback, useReducer } from 'react';
-import { VALIDATOR_REQUIRE } from '../../shared/util/validators';
+import React from 'react';
+
+import {
+  VALIDATOR_MINLENGTH,
+  VALIDATOR_REQUIRE,
+} from '../../shared/util/validators';
 import Input from '../../shared/components/FormElements/Input';
-
-import './NewPlace.css';
 import Button from '../../shared/components/FormElements/Button';
-
-const newPlaceReducer = (state, action) => {
-  switch (action.type) {
-    case 'CHANGE_INPUT':
-      let isFormValid = true;
-      for (let key of Object.keys(state.inputs)) {
-        if (key === action.id) {
-          isFormValid = isFormValid && action.isValid;
-        } else {
-          isFormValid = isFormValid && state.inputs[key]['isValid'];
-        }
-      }
-      return {
-        ...state,
-        inputs: {
-          ...state.inputs,
-          [action.id]: { value: action.value, isValid: action.isValid },
-        },
-        isValid: isFormValid,
-      };
-    default:
-      return state;
-  }
-};
+import useForm from '../../shared/hooks/form-hook';
+import './PlaceForm.css';
 
 const NewPlace = () => {
-  const [allFormState, dispatch] = useReducer(newPlaceReducer, {
-    inputs: {
+  const [allFormState, onInputHandler] = useForm(
+    {
       title: {
         value: '',
         isValid: false,
@@ -40,16 +20,17 @@ const NewPlace = () => {
         value: '',
         isValid: false,
       },
+      address: {
+        value: '',
+        isValid: false,
+      },
     },
-    isValid: false,
-  });
-
-  const onInputHandler = useCallback((id, value, isValid) => {
-    dispatch({ type: 'CHANGE_INPUT', id, value, isValid });
-  }, []);
+    false
+  );
 
   const addNewPlaceHandler = (event) => {
     event.preventDefault();
+    console.log(allFormState.inputs);
   };
 
   return (
@@ -69,6 +50,15 @@ const NewPlace = () => {
         label="Description"
         validators={[VALIDATOR_REQUIRE()]}
         errorText="Please enter a valid description."
+        onInput={onInputHandler}
+      />
+      <Input
+        id="address"
+        element="input"
+        type="text"
+        label="Address"
+        validators={[VALIDATOR_REQUIRE(), VALIDATOR_MINLENGTH(5)]}
+        errorText="Please enter a valid address. (min 5. characters)"
         onInput={onInputHandler}
       />
       <Button disabled={!allFormState.isValid}>Submit</Button>
