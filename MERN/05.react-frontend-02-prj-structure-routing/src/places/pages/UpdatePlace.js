@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { VALIDATOR_REQUIRE } from '../../shared/util/validators';
@@ -6,6 +6,7 @@ import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
 import useForm from '../../shared/hooks/form-hook';
 import './PlaceForm.css';
+import Card from '../../shared/components/UIElements/Card';
 
 const DUMMY_PLACES = [
   {
@@ -38,22 +39,40 @@ const DUMMY_PLACES = [
 
 const UpdatePlace = () => {
   const placeId = useParams()['placeId'];
+  const [isLoading, setLoading] = useState(true);
 
-  const selectedPlace = DUMMY_PLACES.find((place) => place.id === placeId);
-
-  const [formState, inputHandler] = useForm(
+  const [formState, inputHandler, setForm] = useForm(
     {
       title: {
-        value: (selectedPlace && selectedPlace.title) || '',
-        isValid: true,
+        value: '',
+        isValid: false,
       },
       description: {
-        value: (selectedPlace && selectedPlace.description) || '',
-        isValid: true,
+        value: '',
+        isValid: false,
       },
     },
     false
   );
+
+  const selectedPlace = DUMMY_PLACES.find((place) => place.id === placeId);
+
+  useEffect(() => {
+    setForm(
+      {
+        title: {
+          value: (selectedPlace && selectedPlace.title) || '',
+          isValid: true,
+        },
+        description: {
+          value: (selectedPlace && selectedPlace.description) || '',
+          isValid: true,
+        },
+      },
+      false
+    );
+    setLoading(false);
+  }, [setForm, selectedPlace]);
 
   const updatePlaceHandler = (event) => {
     event.preventDefault();
@@ -63,7 +82,16 @@ const UpdatePlace = () => {
   if (!selectedPlace) {
     return (
       <div className="center">
-        <p>Not found place</p>
+        <Card>
+          <h2>Not found any place</h2>
+        </Card>
+      </div>
+    );
+  }
+  if (isLoading) {
+    return (
+      <div className="center">
+        <h2>Loading...</h2>
       </div>
     );
   }
