@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
+import { v4 } from "uuid";
 
-const uuid = require("uuid");
-const HttpError = require("../models/http-error");
+import HttpError from "../models/http-error";
 
 type Place = {
   id: string;
@@ -69,7 +69,7 @@ const findPlaceByUserId = (req: Request, res: Response, next: NextFunction) => {
 const createNewPlace = (req: Request, res: Response, next: NextFunction) => {
   const { title, description, address, location, creator } = req.body;
   const newPlace: Place = {
-    id: uuid.v4(),
+    id: v4(),
     title,
     description,
     address,
