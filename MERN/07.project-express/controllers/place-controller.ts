@@ -55,15 +55,21 @@ const findPlaceById = (req: Request, res: Response, next: NextFunction) => {
   res.json({ place });
 };
 
-const findPlaceByUserId = (req: Request, res: Response, next: NextFunction) => {
+const findPlacesByUserId = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const userId = req.params['uid'];
-  const place = findPlace((place) => place.creator === userId);
-  if (!place) {
+  const places: Place[] = DUMMY_PLACES.filter(
+    (place) => place.creator === userId
+  );
+  if (!places || places.length === 0) {
     return next(
-      new HttpError('Could NOT found any place from provide uid!', 404)
+      new HttpError('Could NOT found any places from provide uid!', 404)
     );
   }
-  res.json({ place });
+  res.json(places);
 };
 
 const createNewPlace = (req: Request, res: Response) => {
@@ -117,5 +123,5 @@ const findPlace = (predicate: (place: Place) => boolean) => {
 };
 
 exports.findPlaceById = findPlaceById;
-exports.findPlaceByUserId = findPlaceByUserId;
+exports.findPlaceByUserId = findPlacesByUserId;
 exports.createNewPlace = createNewPlace;
