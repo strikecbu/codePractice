@@ -11,6 +11,10 @@ app.use(bodyParser.json());
 
 app.use("/api/places", placeRouter);
 
+app.use((req: Request, res: Response, next: NextFunction) => {
+  return next(new HttpError("Could not found this route!", 404));
+});
+
 app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
   if (res.headersSent) {
     return next(error);
