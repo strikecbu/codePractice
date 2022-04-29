@@ -1,7 +1,21 @@
+import { Request, Response, NextFunction } from "express";
+
 const uuid = require("uuid");
 const HttpError = require("../models/http-error");
 
-const DUMMY_PLACES = [
+type Place = {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+  address: string;
+  location: {
+    lat: number;
+    lng: number;
+  };
+  creator: string;
+};
+const DUMMY_PLACES: Place[] = [
   {
     id: "p1",
     title: "Empire State Building",
@@ -30,7 +44,7 @@ const DUMMY_PLACES = [
   },
 ];
 
-const findPlaceById = (req, res, next) => {
+const findPlaceById = (req: Request, res: Response, next: NextFunction) => {
   const placeId = req.params["pid"];
   const place = findPlace((place) => place.id === placeId);
   if (!place) {
@@ -41,7 +55,7 @@ const findPlaceById = (req, res, next) => {
   res.json({ place });
 };
 
-const findPlaceByUserId = (req, res, next) => {
+const findPlaceByUserId = (req: Request, res: Response, next: NextFunction) => {
   const userId = req.params["uid"];
   const place = findPlace((place) => place.creator === userId);
   if (!place) {
@@ -52,9 +66,9 @@ const findPlaceByUserId = (req, res, next) => {
   res.json({ place });
 };
 
-const createNewPlace = (req, res, next) => {
+const createNewPlace = (req: Request, res: Response, next: NextFunction) => {
   const { title, description, address, location, creator } = req.body;
-  const newPlace = {
+  const newPlace: Place = {
     id: uuid.v4(),
     title,
     description,
@@ -63,11 +77,11 @@ const createNewPlace = (req, res, next) => {
     creator,
   };
   DUMMY_PLACES.push(newPlace);
-  res.status = 201;
+  res.status(201);
   res.json(newPlace);
 };
 
-const findPlace = (predicate) => {
+const findPlace = (predicate: (place: Place) => boolean) => {
   return DUMMY_PLACES.find(predicate);
 };
 
