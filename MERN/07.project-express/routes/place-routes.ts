@@ -14,7 +14,6 @@ router.post(
     check('title').not().isEmpty(),
     check('description').isLength({ min: 6 }),
     check('address').not().isEmpty(),
-    check('location').not().isEmpty(),
   ],
   placesController.createNewPlace
 );

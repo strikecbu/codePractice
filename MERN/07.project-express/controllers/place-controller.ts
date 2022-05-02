@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 import { validationResult } from 'express-validator';
 
 import HttpError from '../models/http-error';
+import { getCoordsLocation } from '../util/location';
 
 type Place = {
   id: string;
@@ -73,19 +74,33 @@ const findPlacesByUserId = (
   res.json(places);
 };
 
-const createNewPlace = (req: Request, res: Response) => {
+const createNewPlace = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const error = validationResult(req);
   if (!error.isEmpty()) {
     console.log(error);
-    throw new HttpError('Input validate fail, please check all inputs', 422);
+    return next(
+      new HttpError('Input validate fail, please check all inputs', 422)
+    );
   }
-  const { title, description, address, location, creator } = req.body;
+  const { title, description, address, creator } = req.body;
+
+  let coordinates;
+  try {
+    coordinates = await getCoordsLocation(address);
+  } catch (error) {
+    return next(error);
+  }
+
   const newPlace: Place = {
     id: v4(),
     title,
     description,
     address,
-    location,
+    location: coordinates,
     creator,
   };
   DUMMY_PLACES.push(newPlace);
