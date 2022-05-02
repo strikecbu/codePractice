@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { v4 } from 'uuid';
 import HttpError from '../models/http-error';
+import { validationResult } from 'express-validator';
 
 interface User {
   id: string;
@@ -40,6 +41,11 @@ export function findAllUser(req: Request, res: Response, next: NextFunction) {
 }
 
 export function signupUser(req: Request, res: Response, next: NextFunction) {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    console.log(error);
+    throw new HttpError('Input validate fail, please check all inputs', 422);
+  }
   const { name, email, password } = req.body;
   const hasUser = USERS.find((user) => user.email === email);
   if (hasUser) {
@@ -59,6 +65,11 @@ export function signupUser(req: Request, res: Response, next: NextFunction) {
 }
 
 export function login(req: Request, res: Response, next: NextFunction) {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    console.log(error);
+    throw new HttpError('Input validate fail, please check all inputs', 422);
+  }
   const { email, password } = req.body;
   const user = USERS.find(
     (user) => user.email === email && user.password === password

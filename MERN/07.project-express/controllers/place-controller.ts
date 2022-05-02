@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { v4 } from 'uuid';
+import { validationResult } from 'express-validator';
 
 import HttpError from '../models/http-error';
 
@@ -73,6 +74,11 @@ const findPlacesByUserId = (
 };
 
 const createNewPlace = (req: Request, res: Response) => {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    console.log(error);
+    throw new HttpError('Input validate fail, please check all inputs', 422);
+  }
   const { title, description, address, location, creator } = req.body;
   const newPlace: Place = {
     id: v4(),
@@ -88,6 +94,11 @@ const createNewPlace = (req: Request, res: Response) => {
 };
 
 export function patchPlace(req: Request, res: Response, next: NextFunction) {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    console.log(error);
+    throw new HttpError('Input validate fail, please check all inputs', 422);
+  }
   const { title, description } = req.body;
   const pid = req.params['pid'];
   const place = findPlace((place) => place.id === pid);
