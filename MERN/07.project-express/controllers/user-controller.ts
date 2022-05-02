@@ -7,8 +7,6 @@ interface User {
   email: string;
   password: string;
   name: string;
-  image?: string;
-  places: number;
 }
 
 const USERS: User[] = [
@@ -17,24 +15,17 @@ const USERS: User[] = [
     email: 'test@test.com',
     password: '123456',
     name: 'Andy Chen',
-    image:
-      'https://startuplatte.com/wp-content/uploads/2019/10/Andy-Puddicombe.jpg',
-    places: 3,
   },
 ];
 
 type unSensitiveUser = {
   id: string;
   name: string;
-  image?: string;
-  places: number;
 };
 function removePassword(user: User): unSensitiveUser {
   return {
     id: user.id,
     name: user.name,
-    image: user.image,
-    places: user.places,
   };
 }
 
@@ -50,12 +41,16 @@ export function findAllUser(req: Request, res: Response, next: NextFunction) {
 
 export function signupUser(req: Request, res: Response, next: NextFunction) {
   const { name, email, password } = req.body;
+  const hasUser = USERS.find((user) => user.email === email);
+  if (hasUser) {
+    throw new HttpError('Can not signup user, email already exist ', 422);
+  }
+
   const newUser: User = {
     id: v4(),
     name,
     email,
     password,
-    places: 0,
   };
   USERS.push(newUser);
   res.status(201);
