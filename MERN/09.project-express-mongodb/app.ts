@@ -1,6 +1,7 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import HttpError from './models/http-error';
+import mongoose from 'mongoose';
 
 const placeRouter = require('./routes/place-routes');
 import userRouter from './routes/user-routes';
@@ -26,6 +27,13 @@ app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
   res.json({ message: error.message || 'An unknown error occurred!' });
 });
 
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-});
+mongoose
+  .connect(
+    'mongodb+srv://andy:<password>@cluster0.t6wct.mongodb.net/places?retryWrites=true&w=majority'
+  )
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+    });
+  })
+  .catch((err) => console.log(`fail: ${err}`));
