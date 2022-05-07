@@ -120,49 +120,71 @@ const createNewPlace = async (
   res.json(newPlace);
 };
 
-export function patchPlace(req: Request, res: Response, next: NextFunction) {
+export async function patchPlace(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const error = validationResult(req);
   if (!error.isEmpty()) {
     console.log(error);
-    throw new HttpError(
-      'Patch input validate fail, please check all inputs',
-      422
+    return next(
+      new HttpError('Patch input validate fail, please check all inputs', 422)
     );
   }
   const pid = req.params['pid'];
-  const place = findPlace((place) => place.id === pid);
-  if (!place) {
-    return next(new HttpError('Can not found any place by provided pid', 404));
-  }
-  const { title = place.title, description = place.description } = req.body;
+  const { title, description } = req.body; //兩個都一定有值
 
-  const newPlace = {
-    ...place,
-    title: title,
-    description: description,
-  };
-  DUMMY_PLACES = [
-    ...DUMMY_PLACES.filter((place) => place.id !== pid),
-    newPlace,
-  ];
+  let place;
+  try {
+    // 兩種做法 一個find到直接update，另一個取完後update再save
+    // place = await Place.findById(pid).exec();
+    place = await Place.findByIdAndUpdate(
+      pid,
+      { title, description },
+      { returnDocument: 'after' }
+    ).exec();
+  } catch (err) {
+    console.log(err);
+    return next(new HttpError('Fail to patch place, try again', 500));
+  }
+
+  if (!place) {
+    return next(
+      new HttpError('Can not found the patch place by provided pid', 404)
+    );
+  }
+  // 兩種做法
+  // place.title = title;
+  // place.description = description;
+  // try {
+  //   await place.save();
+  // } catch (err) {
+  //   console.log(err);
+  //   return next(new HttpError('Fail to patch place, try again', 500));
+  // }
+
   res.status(200);
-  res.json(newPlace);
+  res.json(place.toObject({ getters: true }));
 }
 
-export function deletePlace(req: Request, res: Response, next: NextFunction) {
+export async function deletePlace(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const pid = req.params['pid'];
-  const place = findPlace((place) => place.id === pid);
-  if (!place) {
-    return next(new HttpError('Can not found any place by provided pid', 404));
+  let places;
+  try {
+    places = await Place.findByIdAndRemove(pid);
+    console.log(places);
+  } catch (err) {
+    console.log(err);
+    return next(new HttpError('Something went wrong, try again later', 500));
   }
-  DUMMY_PLACES = DUMMY_PLACES.filter((place) => place.id !== pid);
   res.status(200);
   res.json({ pid });
 }
-
-const findPlace = (predicate: (place: any) => boolean) => {
-  return DUMMY_PLACES.find(predicate);
-};
 
 exports.findPlaceById = findPlaceById;
 exports.findPlaceByUserId = findPlacesByUserId;
