@@ -1,84 +1,93 @@
 import { NextFunction, Request, Response } from 'express';
-import { v4 } from 'uuid';
-import HttpError from '../models/http-error';
 import { validationResult } from 'express-validator';
+import User from '../models/Users';
+import HttpError from '../models/http-error';
 
-interface User {
-  id: string;
-  email: string;
-  password: string;
-  name: string;
-}
+export async function findAllUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let users;
+  try {
+    users = await User.find({});
+  } catch (err) {
+    return next(new HttpError('Signup fail, please try again later.', 500));
+  }
 
-const USERS: User[] = [
-  {
-    id: 'u1',
-    email: 'test@test.com',
-    password: '123456',
-    name: 'Andy Chen',
-  },
-];
-
-type unSensitiveUser = {
-  id: string;
-  name: string;
-};
-function removePassword(user: User): unSensitiveUser {
-  return {
-    id: user.id,
-    name: user.name,
-  };
-}
-
-export function findAllUser(req: Request, res: Response, next: NextFunction) {
-  const result: unSensitiveUser[] = [];
-  USERS.forEach((user) => {
-    const unSensitiveUser: unSensitiveUser = removePassword(user);
-    result.push(unSensitiveUser);
-  });
   res.status(200);
-  res.json({ users: result });
+  res.json({
+    users: users.map((user) => {
+      return user.toObject({ getters: true });
+    }),
+  });
 }
 
-export function signupUser(req: Request, res: Response, next: NextFunction) {
+export async function signupUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const error = validationResult(req);
   if (!error.isEmpty()) {
     console.log(error);
-    throw new HttpError('Input validate fail, please check all inputs', 422);
+    return next(
+      new HttpError('Input validate fail, please check all inputs', 422)
+    );
   }
-  const { name, email, password } = req.body;
-  const hasUser = USERS.find((user) => user.email === email);
+  const { name, email, password, places } = req.body;
+
+  let hasUser;
+  try {
+    hasUser = await User.findOne({ email });
+  } catch (err) {
+    return next(new HttpError('Signup fail, please try again later.', 500));
+  }
   if (hasUser) {
-    throw new HttpError('Can not signup user, email already exist ', 422);
+    return next(
+      new HttpError('Can not signup user, email already exist ', 422)
+    );
   }
 
-  const newUser: User = {
-    id: v4(),
-    name,
+  const createdUser = new User({
     email,
+    name,
     password,
-  };
-  USERS.push(newUser);
+    image:
+      'https://scuffedentertainment.com/wp-content/uploads/2021/08/how-cool-are-you-quiz.jpg',
+    places,
+  });
+  try {
+    await createdUser.save();
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError('Fail to create user, please try again', 500);
+    return next(error);
+  }
+
   res.status(201);
-  const result: unSensitiveUser = removePassword(newUser);
-  res.json(result);
+  res.json(createdUser.toObject({ getters: true }));
 }
 
-export function login(req: Request, res: Response, next: NextFunction) {
+export async function login(req: Request, res: Response, next: NextFunction) {
   const error = validationResult(req);
   if (!error.isEmpty()) {
     console.log(error);
-    throw new HttpError('Input validate fail, please check all inputs', 422);
+    return next(
+      new HttpError('Input validate fail, please check all inputs', 422)
+    );
   }
   const { email, password } = req.body;
-  const user = USERS.find(
-    (user) => user.email === email && user.password === password
-  );
+  let user;
+  try {
+    user = await User.findOne({ email, password });
+  } catch (err) {
+    return next(new HttpError('login fail, please try again later.', 500));
+  }
   if (!user) {
     const error = new HttpError('User email or password is incorrect!', 400);
     return next(error);
   }
   res.status(200);
-  const result: unSensitiveUser = removePassword(user);
-  res.json(result);
+  res.json(user.toObject({ getters: true }));
 }
