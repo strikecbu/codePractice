@@ -34,20 +34,20 @@ const findPlacesByUserId = async (
   next: NextFunction
 ) => {
   const userId = req.params['uid'];
-  let places;
+  let userWithPlaces;
   try {
-    places = await Place.find({ creator: userId });
+    userWithPlaces = await User.findById(userId).populate('places');
   } catch (err) {
     console.log(err);
     return next(new HttpError('Something went wrong, try again later', 500));
   }
-  if (!places || places.length === 0) {
+  if (!userWithPlaces || userWithPlaces.places.length === 0) {
     return next(
       new HttpError('Could NOT found any places from provide uid!', 404)
     );
   }
   res.json({
-    places: places.map((place) =>
+    places: userWithPlaces.places.map((place: Document) =>
       place.toObject({ getters: false, virtuals: true })
     ),
   });
