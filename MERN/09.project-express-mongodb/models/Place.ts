@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
 export type IPlace = {
   id: string;
   title: string;
@@ -9,7 +9,7 @@ export type IPlace = {
     lat: number;
     lng: number;
   };
-  creator: string;
+  creator: object;
 };
 const productSchema = new Schema<IPlace>({
   title: { type: String, required: true },
@@ -19,7 +19,7 @@ const productSchema = new Schema<IPlace>({
     lat: { type: Number, required: true },
     lng: { type: Number, required: true },
   },
-  creator: { type: String, required: true },
+  creator: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
 });
 
 export const Place = model<IPlace>('Place', productSchema);

@@ -1,39 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
-import { Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
 import { Place } from '../models/Place';
 import HttpError from '../models/http-error';
 import { getCoordsLocation } from '../util/location';
-
-let DUMMY_PLACES = [
-  {
-    id: 'p1',
-    title: 'Empire State Building',
-    description: 'One of the most famous sky scrapers in the world!',
-    imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg',
-    address: '20 W 34th St, New York, NY 10001',
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878584,
-    },
-    creator: 'u1',
-  },
-  {
-    id: 'p2',
-    title: 'Empire State Building',
-    description: 'One of the most famous sky scrapers in the world!',
-    imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg',
-    address: '20 W 34th St, New York, NY 10001',
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878584,
-    },
-    creator: 'u2',
-  },
-];
+import User from '../models/Users';
 
 const findPlaceById = async (
   req: Request,
@@ -101,6 +73,15 @@ const createNewPlace = async (
   } catch (error) {
     return next(error);
   }
+  let user;
+  try {
+    user = await User.findById(creator);
+  } catch (err) {
+    return next(new HttpError('Found user fail, please try again later.', 500));
+  }
+  if (!user) {
+    return next(new HttpError('Can not find user by provided id ', 404));
+  }
 
   const newPlace: Document = new Place({
     title,
@@ -110,14 +91,19 @@ const createNewPlace = async (
     creator,
   });
   try {
-    await newPlace.save();
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    await newPlace.save({ session });
+    user.places.push(newPlace);
+    await user.save({ session, validateModifiedOnly: true }); // 如果沒有validateModifiedOnly，save會失敗因為_id不為unique，這個參數能只驗證可變動屬性
+    await session.commitTransaction();
   } catch (err) {
     console.log(err);
     const error = new HttpError('Fail to save data, please try again', 500);
     return next(error);
   }
   res.status(201);
-  res.json(newPlace);
+  res.json(newPlace.toObject({ getters: true }));
 };
 
 export async function patchPlace(
@@ -174,10 +160,22 @@ export async function deletePlace(
   next: NextFunction
 ) {
   const pid = req.params['pid'];
-  let places;
+  let place;
   try {
-    places = await Place.findByIdAndRemove(pid);
-    console.log(places);
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    place = await Place.findByIdAndDelete(pid, { session }).populate('creator'); // populate可以將具有ref的欄位取回ref的Model
+    // place = await Place.findById(pid).populate('creator');
+    if (!place) {
+      return next(new HttpError('Fail to get place by provided id. ', 500));
+    }
+
+    // await place.remove({ session });
+    const user: any = place.creator;
+    user.places.pull(place);
+    await user.save({ session, validateModifiedOnly: true });
+    await session.commitTransaction();
+    console.log(place);
   } catch (err) {
     console.log(err);
     return next(new HttpError('Something went wrong, try again later', 500));

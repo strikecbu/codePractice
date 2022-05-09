@@ -10,7 +10,7 @@ export async function findAllUser(
 ) {
   let users;
   try {
-    users = await User.find({});
+    users = await User.find({}, '-password');
   } catch (err) {
     return next(new HttpError('Signup fail, please try again later.', 500));
   }
@@ -35,7 +35,7 @@ export async function signupUser(
       new HttpError('Input validate fail, please check all inputs', 422)
     );
   }
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   let hasUser;
   try {
@@ -55,7 +55,7 @@ export async function signupUser(
     password,
     image:
       'https://scuffedentertainment.com/wp-content/uploads/2021/08/how-cool-are-you-quiz.jpg',
-    places,
+    places: [],
   });
   try {
     await createdUser.save();
