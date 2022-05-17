@@ -2,12 +2,14 @@ FROM node:14
 
 WORKDIR /app
 
-COPY ./package.json /app/
+COPY package.json .
 
 RUN npm install
 
-COPY . /app/
+COPY . /app
 
 EXPOSE 80
+
+# VOLUME [ "/app/feedback" ]
 
 CMD ["node", "server.js"]
