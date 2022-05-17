@@ -17,25 +17,6 @@ interface Employee {
 }
 const store$ = new BehaviorSubject<Employee[]>([]);
 
-store$
-  .pipe(
-    skip(1),
-    map((array) => {
-      return array.sort((d1, d2) => d2.age - d1.age);
-    }),
-    map((array) => array[0]),
-    tap((data) => {
-      console.log(`set input value:`, data);
-      const textInput = document.getElementById(
-        'textInput'
-      ) as HTMLInputElement;
-      textInput.value = data.name;
-      setTimeout(() => {
-        textInput.dispatchEvent(new Event('change'));
-      }, 0);
-    })
-  )
-  .subscribe();
 let count = 0;
 function App() {
   const updateInput = async () => {
@@ -59,6 +40,27 @@ function App() {
       )
       .subscribe();
 
+    const sub0 = store$
+      .pipe(
+        skip(1),
+        map((array) => {
+          return array.sort((d1, d2) => d2.age - d1.age);
+        }),
+        map((array) => array[0]),
+        tap((data) => {
+          console.log(`set input value:`, data);
+          const textInput = document.getElementById(
+            'textInput'
+          ) as HTMLInputElement;
+          textInput.value = data.name;
+          textInput.dispatchEvent(new Event('change'));
+          // setTimeout(() => {
+          //   textInput.dispatchEvent(new Event('change'));
+          // }, 0);
+        })
+      )
+      .subscribe();
+
     const subs1 = fromEvent(document.getElementById('storeBtn') as any, 'click')
       .pipe(
         withLatestFrom(store$),
@@ -73,6 +75,7 @@ function App() {
       console.log('leave it');
       subs.unsubscribe();
       subs1.unsubscribe();
+      sub0.unsubscribe();
     };
   }, []);
 
