@@ -10,6 +10,9 @@ COPY . .
 
 ENV PORT 80
 
+ENV MONGODB_USER_NAME=andy
+ENV MONGODB_USER_PASSWORD=notRight
+
 EXPOSE ${PORT}
 
 VOLUME [ "/app/node_modules" ]
