@@ -7,9 +7,10 @@ import reactor.test.StepVerifier;
 
 public class FluxAndMonoGeneratorServiceTest {
 
+    FluxAndMonoGeneratorService service = new FluxAndMonoGeneratorService();
+
     @Test
     void testFlux() {
-        FluxAndMonoGeneratorService service = new FluxAndMonoGeneratorService();
         Flux<String> stringFlux = service.namesFlux();
 
         StepVerifier.create(stringFlux)
@@ -30,10 +31,33 @@ public class FluxAndMonoGeneratorServiceTest {
 
     @Test
     void testMono() {
-        FluxAndMonoGeneratorService service = new FluxAndMonoGeneratorService();
         Mono<String> nameMono = service.nameMono();
         StepVerifier.create(nameMono)
                 .expectNext("Andy")
+                .verifyComplete();
+    }
+
+    @Test
+    void namesMono_map_filter() {
+        Mono<String> stringMono = service.namesMono_map_filter(6);
+        StepVerifier.create(stringMono)
+                .expectNextCount(0)
+                .verifyComplete();
+    }
+
+    @Test
+    void namesFlux_flatmap() {
+        Flux<String> stringFlux = service.namesFlux_flatmap(3);
+        StepVerifier.create(stringFlux)
+                .expectNext("A", "N", "D", "Y", "K", "O", "B", "E", "J", "A", "M", "E", "S")
+                .verifyComplete();
+    }
+
+    @Test
+    void namesFlux_flatmap_async() {
+        Flux<String> stringFlux = service.namesFlux_flatmap_async(3);
+        StepVerifier.create(stringFlux)
+                .expectNextCount(13)
                 .verifyComplete();
     }
 }
