@@ -102,6 +102,7 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNext("D", "E", "F", "A", "U", "L", "T")
                 .verifyComplete();
     }
+
     @Test
     void namesMono_emptyDefault() {
         Mono<String> stringMono = service.namesMono_emptyDefault(6);
@@ -109,11 +110,41 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNext("default")
                 .verifyComplete();
     }
+
     @Test
     void namesMono_map_filter_switchIfEmpty() {
         Mono<String> stringMono = service.namesMono_map_filter_switchIfEmpty(6);
         StepVerifier.create(stringMono)
                 .expectNext("DEFAULT")
+                .verifyComplete();
+    }
+
+    @Test
+    void explore_concatwith() {
+        Flux<String> flux = service.explore_concatwith();
+        StepVerifier.create(flux)
+                .expectNext("A", "B", "C", "D", "E", "F")
+                .verifyComplete();
+    }
+    @Test
+    void explore_concatwith_mono() {
+        Flux<String> flux = service.explore_concatwith_mono();
+        StepVerifier.create(flux)
+                .expectNext("A", "C")
+                .verifyComplete();
+    }
+    @Test
+    void explore_mergeWith() {
+        Flux<String> flux = service.explore_mergeWith();
+        StepVerifier.create(flux)
+                .expectNext("C", "A", "D", "B")
+                .verifyComplete();
+    }
+    @Test
+    void explore_mergeWith_mono() {
+        Flux<String> flux = service.explore_mergeWith_mono();
+        StepVerifier.create(flux)
+                .expectNext("A", "B", "C")
                 .verifyComplete();
     }
 }
