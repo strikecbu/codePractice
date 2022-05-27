@@ -37,15 +37,35 @@ public class FluxAndMonoGeneratorService {
         return Flux.fromArray(str.split(""));
     }
 
-    public Flux<String> namesFlux_flatmap_async(int length) {
+    public Flux<String> namesFlux_flatMap_async(int length) {
         return Flux.fromIterable(List.of("Andy", "Kobe", "James", "Zol"))
                 .map(String::toUpperCase)
                 .filter(str -> str.length() > length)
-                .flatMap(this::splitString_async)
+                .flatMap(this::splitString_with_delay)
                 .log();
     }
 
-    private Flux<String> splitString_async(String str) {
+    public Mono<List<String>> namesMono_flatMap(int length) {
+        return Mono.just("alex")
+                .map(String::toUpperCase)
+                .filter(str -> str.length() > length)
+                .flatMap(this::splitStringToList);
+    }
+    public Flux<String> namesMono_flatMapMany(int length) {
+        return Mono.just("alex")
+                .map(String::toUpperCase)
+                .filter(str -> str.length() > length)
+                .flatMapMany(this::splitString);
+    }
+
+
+
+    private Mono<List<String>> splitStringToList(String s) {
+        List<String> strings = List.of(s.split(""));
+        return Mono.just(strings);
+    }
+
+    private Flux<String> splitString_with_delay(String str) {
         long randMillis = new Random().nextInt(1000);
         return Flux.fromArray(str.split(""))
                 .delayElements(Duration.ofMillis(randMillis));
