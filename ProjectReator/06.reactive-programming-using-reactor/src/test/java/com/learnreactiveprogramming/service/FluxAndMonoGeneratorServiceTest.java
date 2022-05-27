@@ -62,6 +62,7 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNextCount(13)
                 .verifyComplete();
     }
+
     @Test
     void namesMono_flatMap() {
         Mono<List<String>> stringFlux = service.namesMono_flatMap(3);
@@ -69,11 +70,50 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNext(List.of("A", "L", "E", "X"))
                 .verifyComplete();
     }
+
     @Test
     void namesMono_flatMapMany() {
         Flux<String> stringFlux = service.namesMono_flatMapMany(3);
         StepVerifier.create(stringFlux)
                 .expectNext("A", "L", "E", "X")
+                .verifyComplete();
+    }
+
+    @Test
+    void namesFlux_transform() {
+        Flux<String> stringFlux = service.namesFlux_transform(3);
+        StepVerifier.create(stringFlux)
+                .expectNext("A", "N", "D", "Y", "K", "O", "B", "E", "J", "A", "M", "E", "S")
+                .verifyComplete();
+    }
+
+    @Test
+    void namesFlux_emptyDefault() {
+        Flux<String> stringFlux = service.namesFlux_emptyDefault(6);
+        StepVerifier.create(stringFlux)
+                .expectNext("default")
+                .verifyComplete();
+    }
+
+    @Test
+    void namesFlux_switchIfEmpty() {
+        Flux<String> stringFlux = service.namesFlux_switchIfEmpty(6);
+        StepVerifier.create(stringFlux)
+                .expectNext("D", "E", "F", "A", "U", "L", "T")
+                .verifyComplete();
+    }
+    @Test
+    void namesMono_emptyDefault() {
+        Mono<String> stringMono = service.namesMono_emptyDefault(6);
+        StepVerifier.create(stringMono)
+                .expectNext("default")
+                .verifyComplete();
+    }
+    @Test
+    void namesMono_map_filter_switchIfEmpty() {
+        Mono<String> stringMono = service.namesMono_map_filter_switchIfEmpty(6);
+        StepVerifier.create(stringMono)
+                .expectNext("DEFAULT")
                 .verifyComplete();
     }
 }
