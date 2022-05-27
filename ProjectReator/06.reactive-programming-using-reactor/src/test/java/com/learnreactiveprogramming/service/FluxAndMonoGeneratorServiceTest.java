@@ -147,4 +147,18 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNext("A", "B", "C")
                 .verifyComplete();
     }
+    @Test
+    void explore_zip() {
+        Flux<String> flux = service.explore_zip();
+        StepVerifier.create(flux)
+                .expectNext("AC", "BD")
+                .verifyComplete();
+    }
+    @Test
+    void explore_zipWith_mono() {
+        Flux<String> flux = service.explore_zipWith_mono();
+        StepVerifier.create(flux)
+                .expectNext("AC")
+                .verifyComplete();
+    }
 }

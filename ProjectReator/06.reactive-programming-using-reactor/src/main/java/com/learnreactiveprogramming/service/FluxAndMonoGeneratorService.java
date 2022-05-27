@@ -171,4 +171,22 @@ public class FluxAndMonoGeneratorService {
         return abMono.mergeWith(cMono)
                 .log();
     }
+
+    public Flux<String> explore_zip() {
+        Flux<String> abFlux = Flux.just("A", "B");
+        Flux<String> cdeFlux = Flux.just("C", "D", "E");
+
+        return Flux.zip(abFlux, cdeFlux)
+                .map(t -> t.getT1() + t.getT2())
+                .log();
+    }
+    public Flux<String> explore_zipWith_mono() {
+        Flux<String> abFlux = Flux.just("A", "B");
+        Mono<String> cFlux = Mono.just("C");
+
+        return abFlux.zipWith(cFlux)
+                .map(t -> t.getT1() + t.getT2())
+                .log();
+    }
+
 }
