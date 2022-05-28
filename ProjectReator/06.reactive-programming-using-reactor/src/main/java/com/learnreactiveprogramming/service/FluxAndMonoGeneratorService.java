@@ -1,5 +1,7 @@
 package com.learnreactiveprogramming.service;
 
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 
+@Slf4j
 public class FluxAndMonoGeneratorService {
 
     public static void main(String[] args) {
@@ -187,6 +190,52 @@ public class FluxAndMonoGeneratorService {
         return abFlux.zipWith(cFlux)
                 .map(t -> t.getT1() + t.getT2())
                 .log();
+    }
+
+    public Flux<String> namesFlux_onErrorReturn(int length) {
+        Function<Flux<String>, Flux<String>> filterFn = (Flux<String> flux) -> flux
+                .filter(str -> str.length() > length);
+
+        return Flux.fromIterable(List.of("Andy", "Kobe", "James", "Zol"))
+                .transform(filterFn)
+                .doOnNext(name -> {
+                    if ("Kobe".equalsIgnoreCase(name)) {
+                        throw new IllegalArgumentException();
+                    }
+                })
+                .onErrorReturn(IllegalArgumentException.class, "Error occurred");
+    }
+    public Flux<String> namesFlux_onErrorResume(int length) {
+        Function<Flux<String>, Flux<String>> filterFn = (Flux<String> flux) -> flux
+                .filter(str -> str.length() > length);
+
+        Flux<String> resumeFlux = Flux.fromIterable(List.of("Cindy", "LuLu"));
+
+        return Flux.fromIterable(List.of("Andy", "Kobe", "James", "Zol"))
+                .transform(filterFn)
+                .doOnNext(name -> {
+                    if ("Kobe".equalsIgnoreCase(name)) {
+                        throw new IllegalArgumentException("Wrong pick!");
+                    }
+                })
+                .onErrorResume(IllegalArgumentException.class,(e) -> {
+                    log.info("Some exception occurred", e);
+                    return resumeFlux;
+                } );
+    }
+    public Flux<String> namesFlux_onErrorContinue(String ...names) {
+
+        return Flux.fromIterable(List.of(names))
+                .doOnNext(name -> {
+                    if ("Kobe".equalsIgnoreCase(name)) {
+                        throw new IllegalArgumentException("Wrong pick!");
+                    } else if ("Kate".equalsIgnoreCase(name)) {
+                        throw new RuntimeException("What are you thinking ?!");
+                    }
+                })
+                .onErrorContinue(IllegalArgumentException.class, (e, name) -> {
+                    log.info("Still give you a chance! {}", name);
+                });
     }
 
 }

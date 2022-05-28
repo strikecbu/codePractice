@@ -126,6 +126,7 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNext("A", "B", "C", "D", "E", "F")
                 .verifyComplete();
     }
+
     @Test
     void explore_concatwith_mono() {
         Flux<String> flux = service.explore_concatwith_mono();
@@ -133,6 +134,7 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNext("A", "C")
                 .verifyComplete();
     }
+
     @Test
     void explore_mergeWith() {
         Flux<String> flux = service.explore_mergeWith();
@@ -140,6 +142,7 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNext("C", "A", "D", "B")
                 .verifyComplete();
     }
+
     @Test
     void explore_mergeWith_mono() {
         Flux<String> flux = service.explore_mergeWith_mono();
@@ -147,6 +150,7 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNext("A", "B", "C")
                 .verifyComplete();
     }
+
     @Test
     void explore_zip() {
         Flux<String> flux = service.explore_zip();
@@ -154,11 +158,39 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNext("AC", "BD")
                 .verifyComplete();
     }
+
     @Test
     void explore_zipWith_mono() {
         Flux<String> flux = service.explore_zipWith_mono();
         StepVerifier.create(flux)
                 .expectNext("AC")
                 .verifyComplete();
+    }
+
+    @Test
+    void namesFlux_onErrorReturn() {
+        Flux<String> flux = service.namesFlux_onErrorReturn(3)
+                .log();
+        StepVerifier.create(flux)
+                .expectNext("Andy", "Error occurred")
+                .verifyComplete();
+    }
+
+    @Test
+    void namesFlux_onErrorResume() {
+        Flux<String> flux = service.namesFlux_onErrorResume(3)
+                .log();
+        StepVerifier.create(flux)
+                .expectNext("Andy", "Cindy", "LuLu")
+                .verifyComplete();
+    }
+    @Test
+    void namesFlux_onErrorContinue() {
+        Flux<String> flux = service.namesFlux_onErrorContinue("Andy", "Kobe", "James","Kate",  "Zol")
+                .log();
+        StepVerifier.create(flux)
+                .expectNext("Andy", "James")
+                .expectError(RuntimeException.class)
+                .verify();
     }
 }
