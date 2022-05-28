@@ -21,6 +21,9 @@ class MovieServiceMockitoTest {
     @Mock
     private ReviewService reviewService = new ReviewService();
 
+    @Mock
+    private RevenueService revenueService;
+
     @InjectMocks
     private MovieService movieService;
 
@@ -76,6 +79,7 @@ class MovieServiceMockitoTest {
         Mockito.verify(reviewService, Mockito.times(4))
                 .retrieveReviewsFlux(Mockito.anyLong());
     }
+
     @Test
     void getAllMovies_retryWhen() {
 
@@ -95,6 +99,7 @@ class MovieServiceMockitoTest {
         Mockito.verify(reviewService, Mockito.times(4))
                 .retrieveReviewsFlux(Mockito.anyLong());
     }
+
     @Test
     void getAllMovies_repeat() {
         Mockito.when(movieInfoService.movieInfoFlux())
@@ -113,5 +118,25 @@ class MovieServiceMockitoTest {
 
         Mockito.verify(reviewService, Mockito.times(9))
                 .retrieveReviewsFlux(Mockito.anyLong());
+    }
+
+    @Test
+    void getAllMoviesWithRevenueFlux() {
+        Mockito.when(movieInfoService.movieInfoFlux())
+                .thenCallRealMethod();
+        Mockito.when(reviewService.retrieveReviewsFlux(Mockito.anyLong()))
+                .thenCallRealMethod();
+        Mockito.when(revenueService.getRevenue(Mockito.anyLong()))
+                .thenCallRealMethod();
+
+        Flux<Movie> movieFlux = movieService.getAllMoviesWithRevenueFlux()
+                .log();
+
+        StepVerifier.create(movieFlux)
+                .expectNextCount(3)
+                .verifyComplete();
+
+        Mockito.verify(revenueService, Mockito.times(3))
+                .getRevenue(Mockito.anyLong());
     }
 }

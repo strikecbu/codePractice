@@ -6,9 +6,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Data
+
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class Movie {
     private Long movieId;
     private MovieInfo movie;
