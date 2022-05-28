@@ -35,6 +35,22 @@ public class MovieService {
                         .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) -> Exceptions.propagate(retrySignal.failure())));
         return getAllMoviesFlux().retryWhen(backoff);
     }
+    public Flux<Movie> getAllMovies_repeat() {
+        RetryBackoffSpec backoff =
+                Retry.fixedDelay(3, Duration.ofMillis(500))
+                        .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) -> Exceptions.propagate(retrySignal.failure())));
+        return getAllMoviesFlux()
+                .retryWhen(backoff)
+                .repeat();
+    }
+    public Flux<Movie> getAllMovies_repeat_n(long n) {
+        RetryBackoffSpec backoff =
+                Retry.fixedDelay(3, Duration.ofMillis(500))
+                        .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) -> Exceptions.propagate(retrySignal.failure())));
+        return getAllMoviesFlux()
+                .retryWhen(backoff)
+                .repeat(n);
+    }
 
     private Flux<Movie> getAllMoviesFlux() {
         return movieInfoService.movieInfoFlux()

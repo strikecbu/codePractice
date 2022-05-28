@@ -95,4 +95,23 @@ class MovieServiceMockitoTest {
         Mockito.verify(reviewService, Mockito.times(4))
                 .retrieveReviewsFlux(Mockito.anyLong());
     }
+    @Test
+    void getAllMovies_repeat() {
+        Mockito.when(movieInfoService.movieInfoFlux())
+                .thenCallRealMethod();
+        Mockito.when(reviewService.retrieveReviewsFlux(Mockito.anyLong()))
+                .thenCallRealMethod();
+
+        var noRepeatTimes = 3L;
+        Flux<Movie> movieFlux = movieService.getAllMovies_repeat_n(noRepeatTimes)
+                .log();
+
+        StepVerifier.create(movieFlux)
+                .expectNextCount(9)
+                .thenCancel()
+                .verify();
+
+        Mockito.verify(reviewService, Mockito.times(9))
+                .retrieveReviewsFlux(Mockito.anyLong());
+    }
 }
