@@ -2,6 +2,8 @@ package com.learnreactiveprogramming.service;
 
 import com.learnreactiveprogramming.util.CommonUtil;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.ParallelFlux;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
@@ -22,12 +24,33 @@ public class FluxAndMonoSchedulerService {
 
     public Flux<String> namesFlux_publishOn() {
         var flux1 = namesFlux1
-                .subscribeOn(Schedulers.parallel())
+                .publishOn(Schedulers.parallel())
                 .map(this::toUpperCase);
         var flux2 = namesFlux2
                 .publishOn(Schedulers.parallel())
                 .map(this::toUpperCase);
         return flux1.mergeWith(flux2);
+    }
+
+    public ParallelFlux<String> namesFlux_parallel() {
+        return namesFlux1.parallel()
+                .runOn(Schedulers.parallel())
+                .map(this::toUpperCase);
+    }
+
+    public Flux<String> namesFlux_parallel_with_flatmap() {
+        return namesFlux1
+                .flatMap(name -> Mono.just(name)
+                        .subscribeOn(Schedulers.parallel())
+                        .map(this::toUpperCase));
+
+    }
+    public Flux<String> namesFlux_parallel_with_flatMapSequential() {
+        return namesFlux1
+                .flatMapSequential(name -> Mono.just(name)
+                        .subscribeOn(Schedulers.parallel())
+                        .map(this::toUpperCase));
+
     }
 
 
