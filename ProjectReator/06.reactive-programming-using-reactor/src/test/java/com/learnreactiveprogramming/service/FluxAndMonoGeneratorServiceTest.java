@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.test.scheduler.VirtualTimeScheduler;
 
+import java.time.Duration;
 import java.util.List;
 
 public class FluxAndMonoGeneratorServiceTest {
@@ -59,6 +61,15 @@ public class FluxAndMonoGeneratorServiceTest {
     void namesFlux_flatmap_async() {
         Flux<String> stringFlux = service.namesFlux_flatMap_async(3);
         StepVerifier.create(stringFlux)
+                .expectNextCount(13)
+                .verifyComplete();
+    }
+    @Test
+    void namesFlux_flatmap_async_virtualTime() {
+        VirtualTimeScheduler.getOrSet();
+        Flux<String> stringFlux = service.namesFlux_flatMap_async(3);
+        StepVerifier.withVirtualTime(() -> stringFlux)
+                .thenAwait(Duration.ofSeconds(5))
                 .expectNextCount(13)
                 .verifyComplete();
     }
