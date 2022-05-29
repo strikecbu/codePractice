@@ -1,6 +1,7 @@
 package com.learnreactiveprogramming.service;
 
 import com.learnreactiveprogramming.domain.MovieInfo;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -11,6 +12,15 @@ import static com.learnreactiveprogramming.util.CommonUtil.delay;
 
 public class MovieInfoService {
 
+    private WebClient webClient;
+
+    public MovieInfoService() {
+    }
+
+    public MovieInfoService(WebClient webClient) {
+        this.webClient = webClient;
+    }
+
     public  Flux<MovieInfo> movieInfoFlux(){
 
         var movieInfoList = List.of(new MovieInfo(1l,100l, "Batman Begins", 2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15")),
@@ -18,6 +28,18 @@ public class MovieInfoService {
                 new MovieInfo(3l, 102l,"Dark Knight Rises", 2008, List.of("Christian Bale", "Tom Hardy"), LocalDate.parse("2012-07-20")));
 
         return Flux.fromIterable(movieInfoList);
+    }
+    public  Flux<MovieInfo> movieInfoFlux_with_webclient(){
+        return webClient.get()
+                .uri("/v1/movie_infos")
+                .retrieve()
+                .bodyToFlux(MovieInfo.class);
+    }
+    public  Mono<MovieInfo> movieInfoById_with_webclient(long movieInfoId){
+        return webClient.get()
+                .uri("/v1/movie_infos/{id}", movieInfoId)
+                .retrieve()
+                .bodyToMono(MovieInfo.class);
     }
 
     public  Mono<MovieInfo> retrieveMovieInfoMonoUsingId(long movieId){

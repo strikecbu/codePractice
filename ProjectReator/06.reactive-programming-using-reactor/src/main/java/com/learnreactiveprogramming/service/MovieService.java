@@ -20,7 +20,7 @@ public class MovieService {
     private final MovieInfoService movieInfoService;
     private final ReviewService reviewService;
 
-    private final RevenueService revenueService;
+    private RevenueService revenueService;
 
 
     public MovieService(MovieInfoService movieInfoService, ReviewService reviewService, RevenueService revenueService) {
@@ -29,8 +29,25 @@ public class MovieService {
         this.revenueService = revenueService;
     }
 
+    public MovieService(MovieInfoService movieInfoService, ReviewService reviewService) {
+        this.movieInfoService = movieInfoService;
+        this.reviewService = reviewService;
+    }
+
     public Flux<Movie> getAllMovies() {
         return getAllMoviesFlux();
+    }
+    public Flux<Movie> getAllMovies_RestClient() {
+        return movieInfoService.movieInfoFlux_with_webclient()
+                .flatMap(movieInfo -> {
+                    var listMono = reviewService.retrieveReviewsFlux_RestClient(movieInfo.getMovieInfoId())
+                            .collectList();
+                    return listMono.map(reviews -> new Movie(movieInfo.getMovieId(), movieInfo, reviews));
+                })
+                .onErrorMap(e -> {
+                    log.error("Some error occurred", e);
+                    return new MovieException(e);
+                });
     }
 
     public Flux<Movie> getAllMovies_retry() {
@@ -98,6 +115,14 @@ public class MovieService {
     public Mono<Movie> getMovieById(long movieId) {
         var movieInfoMono = movieInfoService.retrieveMovieInfoMonoUsingId(movieId);
         Mono<List<Review>> listMono = reviewService.retrieveReviewsFlux(movieId)
+                .collectList();
+        return Mono.zip(movieInfoMono, listMono)
+                .map(tuple -> new Movie(tuple.getT1()
+                        .getMovieId(), tuple.getT1(), tuple.getT2()));
+    }
+    public Mono<Movie> getMovieById_RestClient(long movieInfoId) {
+        var movieInfoMono = movieInfoService.movieInfoById_with_webclient(movieInfoId);
+        Mono<List<Review>> listMono = reviewService.retrieveReviewsFlux_RestClient(movieInfoId)
                 .collectList();
         return Mono.zip(movieInfoMono, listMono)
                 .map(tuple -> new Movie(tuple.getT1()
