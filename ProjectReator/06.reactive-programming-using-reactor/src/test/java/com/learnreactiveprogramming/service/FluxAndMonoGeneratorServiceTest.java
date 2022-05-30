@@ -64,6 +64,7 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNextCount(13)
                 .verifyComplete();
     }
+
     @Test
     void namesFlux_flatmap_async_virtualTime() {
         VirtualTimeScheduler.getOrSet();
@@ -195,13 +196,54 @@ public class FluxAndMonoGeneratorServiceTest {
                 .expectNext("Andy", "Cindy", "LuLu")
                 .verifyComplete();
     }
+
     @Test
     void namesFlux_onErrorContinue() {
-        Flux<String> flux = service.namesFlux_onErrorContinue("Andy", "Kobe", "James","Kate",  "Zol")
+        Flux<String> flux = service.namesFlux_onErrorContinue("Andy", "Kobe", "James", "Kate", "Zol")
                 .log();
         StepVerifier.create(flux)
                 .expectNext("Andy", "James")
                 .expectError(RuntimeException.class)
                 .verify();
     }
+
+    @Test
+    void explore_generate() {
+        Flux<Integer> integerFlux = service.explore_flux_generate()
+                .log();
+
+        StepVerifier.create(integerFlux)
+                .expectNextCount(10)
+                .verifyComplete();
+    }
+
+    @Test
+    void explore_flux_create() {
+        Flux<String> integerFlux = service.explore_flux_create()
+                .log();
+
+        StepVerifier.create(integerFlux)
+                .expectNext("Andy", "Anne", "Felix", "Robe", "Dannie")
+                .verifyComplete();
+    }
+    @Test
+    void explore_flux_handle() {
+        Flux<String> integerFlux = service.explore_flux_handle()
+                .log();
+
+        StepVerifier.create(integerFlux)
+                .expectNext("ANDY", "ANNE")
+                .verifyComplete();
+    }
+
+    @Test
+    void explore_mono_create() {
+        Mono<String> stringMono = service.explore_mono_create()
+                .log();
+
+        StepVerifier.create(stringMono)
+                .expectNext("Cube")
+                .verifyComplete();
+    }
+
 }

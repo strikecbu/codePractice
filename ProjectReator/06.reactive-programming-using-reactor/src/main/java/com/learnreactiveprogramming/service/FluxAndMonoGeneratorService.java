@@ -1,6 +1,5 @@
 package com.learnreactiveprogramming.service;
 
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -8,7 +7,10 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+
+import static com.learnreactiveprogramming.util.CommonUtil.delay;
 
 @Slf4j
 public class FluxAndMonoGeneratorService {
@@ -20,6 +22,11 @@ public class FluxAndMonoGeneratorService {
         service.nameMono()
                 .subscribe(str -> System.out.printf("Mono name: %s%n", str));
 
+    }
+
+    public static List<String> getNames() {
+        delay(1000);
+        return List.of("Andy", "Anne", "Felix", "Robe", "Dannie");
     }
 
     public Flux<String> namesFlux() {
@@ -183,6 +190,7 @@ public class FluxAndMonoGeneratorService {
                 .map(t -> t.getT1() + t.getT2())
                 .log();
     }
+
     public Flux<String> explore_zipWith_mono() {
         Flux<String> abFlux = Flux.just("A", "B");
         Mono<String> cFlux = Mono.just("C");
@@ -205,6 +213,7 @@ public class FluxAndMonoGeneratorService {
                 })
                 .onErrorReturn(IllegalArgumentException.class, "Error occurred");
     }
+
     public Flux<String> namesFlux_onErrorResume(int length) {
         Function<Flux<String>, Flux<String>> filterFn = (Flux<String> flux) -> flux
                 .filter(str -> str.length() > length);
@@ -218,12 +227,13 @@ public class FluxAndMonoGeneratorService {
                         throw new IllegalArgumentException("Wrong pick!");
                     }
                 })
-                .onErrorResume(IllegalArgumentException.class,(e) -> {
+                .onErrorResume(IllegalArgumentException.class, (e) -> {
                     log.info("Some exception occurred", e);
                     return resumeFlux;
-                } );
+                });
     }
-    public Flux<String> namesFlux_onErrorContinue(String ...names) {
+
+    public Flux<String> namesFlux_onErrorContinue(String... names) {
 
         return Flux.fromIterable(List.of(names))
                 .doOnNext(name -> {
@@ -237,5 +247,41 @@ public class FluxAndMonoGeneratorService {
                     log.info("Still give you a chance! {}", name);
                 });
     }
+
+    public Flux<Integer> explore_flux_generate() {
+        return Flux.generate(() -> 1, (state, sink) -> {
+            sink.next(state * 2);
+            if (state == 10) {
+                sink.complete();
+            }
+            return state + 1;
+        });
+    }
+
+    public Flux<String> explore_flux_create() {
+        return Flux.create(sink -> {
+//            getNames().forEach(sink::next);
+//            sink.complete();
+            CompletableFuture.supplyAsync(FluxAndMonoGeneratorService::getNames)
+                    .thenAccept(names -> {
+                        names.forEach(sink::next);
+                    })
+                    .thenRun(sink::complete);
+        });
+    }
+
+    public Mono<String> explore_mono_create() {
+        return Mono.create(monoSink -> monoSink.success("Cube"));
+    }
+
+    public Flux<String> explore_flux_handle() {
+        return Flux.fromIterable(List.of("Andy", "Anne", "Felix", "Robe", "Dannie"))
+                .handle((name, sink) -> {
+                    if (name.startsWith("A")) {
+                        sink.next(name.toUpperCase());
+                    }
+                });
+    }
+
 
 }
