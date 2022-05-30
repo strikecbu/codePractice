@@ -283,5 +283,14 @@ public class FluxAndMonoGeneratorService {
                 });
     }
 
+    public Flux<String> nameFlux_debugging(Exception e) {
+        return Flux.just("Andy")
+                .concatWith(Flux.error(e))
+                .onErrorMap(err -> {
+                    log.error("Something goes wrong:", e);
+                    return new RuntimeException(err);
+                });
+    }
+
 
 }

@@ -2,9 +2,11 @@ package com.learnreactiveprogramming.service;
 
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.scheduler.VirtualTimeScheduler;
+import reactor.tools.agent.ReactorDebugAgent;
 
 import java.time.Duration;
 import java.util.List;
@@ -246,4 +248,17 @@ public class FluxAndMonoGeneratorServiceTest {
                 .verifyComplete();
     }
 
+    @Test
+    void nameFlux_debugging() {
+//        Hooks.onOperatorDebug(); //會有效能議題
+        ReactorDebugAgent.init(); // Production ready
+        ReactorDebugAgent.processExistingClasses();
+        Flux<String> flux = service.nameFlux_debugging(new IllegalArgumentException(
+                "You given wrong args"));
+
+        StepVerifier.create(flux)
+                .expectNext("Andy")
+                .expectError(RuntimeException.class)
+                .verify();
+    }
 }
