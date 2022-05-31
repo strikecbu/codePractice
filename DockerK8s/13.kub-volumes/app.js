@@ -19,6 +19,10 @@ app.get('/story', (req, res) => {
   });
 });
 
+app.get('/error', () => {
+  process.exit(1);
+})
+
 app.post('/story', (req, res) => {
   const newText = req.body.text;
   if (newText.trim().length === 0) {
