@@ -1,4 +1,4 @@
-package guru.springframework.msscbrewery.service;
+package guru.springframework.msscbrewery.services;
 
 import guru.springframework.msscbrewery.web.model.Customer;
 
