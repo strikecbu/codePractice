@@ -29,9 +29,11 @@ public class BeerControllerTest {
     @MockBean
     BeerService beerService;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     MockMvc mockMvc;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     ObjectMapper objectMapper;
 
@@ -100,10 +102,10 @@ public class BeerControllerTest {
 
     @Test
     public void deleteBeer() throws Exception {
-        UUID id = UUID.randomUUID();
         mockMvc.perform(delete("/api/v1/beer/" + validBeer.getId()))
                 .andExpect(status().isNoContent());
 
-        then(beerService).should().deleteBeer(any());
+        then(beerService).should()
+                .deleteBeer(any());
     }
 }
