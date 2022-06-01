@@ -12,13 +12,13 @@ import java.time.Duration;
 public class FluxAndMonoController {
 
     @GetMapping("/flux")
-    public Flux<Integer> getFlex() {
+    public Flux<Integer> getFlux() {
         return Flux.just(1, 2, 3, 4);
     }
 
     @GetMapping("/mono")
-    public Mono<Integer> getMono() {
-        return Mono.just(1);
+    public Mono<String> getMono() {
+        return Mono.just("hello-world");
     }
 
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
