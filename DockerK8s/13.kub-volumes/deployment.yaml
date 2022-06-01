@@ -22,11 +22,23 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 3000
+        env:
+          - name: STORY_PATH
+            # value: story
+            valueFrom:
+              configMapKeyRef:
+                name: story-config
+                key: store-path
         volumeMounts:
           - mountPath: /app/story
             name: story-vol
       volumes:
         - name: story-vol
-          emptyDir: {}
+          # emptyDir: {}
+          # hostPath:
+          #   path: /data2
+          #   type: DirectoryOrCreate
+          persistentVolumeClaim:
+            claimName: host-pvc
             
           
