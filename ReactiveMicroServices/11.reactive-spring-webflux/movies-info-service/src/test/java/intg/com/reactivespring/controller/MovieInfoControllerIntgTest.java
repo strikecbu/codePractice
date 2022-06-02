@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-class MovieInfoControllerTest {
+class MovieInfoControllerIntgTest {
 
     private final String MOVIE_INFO_URL = "/v1/movieInfos";
     @Autowired
