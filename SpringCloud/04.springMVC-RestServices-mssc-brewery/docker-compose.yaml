@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  brewery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - jarFile=mssc-brewery-1.0.1-SNAPSHOT.jar
+    ports:
+      - 8087:8080
