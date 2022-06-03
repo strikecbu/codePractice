@@ -15,11 +15,10 @@ import java.util.UUID;
 public class BreweryClient {
     private final String BEER_API_PATH = "/api/v1/beer";
     private final String CUSTOMER_PATH_V1 = "/api/v1/customer";
+    private final RestTemplate restTemplate;
     private String apiHost;
 
-    private final RestTemplate restTemplate;
-
-    public BreweryClient( RestTemplateBuilder restTemplateBuilder) {
+    public BreweryClient(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
     }
 
@@ -45,18 +44,18 @@ public class BreweryClient {
     }
 
     public CustomerDto getCustomerById(UUID customerId) {
-        return restTemplate.getForObject(apiHost+ CUSTOMER_PATH_V1 + customerId.toString(), CustomerDto.class);
+        return restTemplate.getForObject(apiHost + CUSTOMER_PATH_V1 + "/" + customerId.toString(), CustomerDto.class);
     }
 
     public URI saveNewCustomer(CustomerDto customerDto) {
-        return  restTemplate.postForLocation(apiHost + CUSTOMER_PATH_V1, customerDto);
+        return restTemplate.postForLocation(apiHost + CUSTOMER_PATH_V1, customerDto);
     }
 
     public void updateCustomer(UUID customerId, CustomerDto customerDto) {
-        restTemplate.put(apiHost + CUSTOMER_PATH_V1 + customerId, customerDto);
+        restTemplate.put(apiHost + CUSTOMER_PATH_V1 + "/" + customerId, customerDto);
     }
 
     public void deleteCustomer(UUID customerId) {
-        restTemplate.delete(apiHost + CUSTOMER_PATH_V1 + customerId);
+        restTemplate.delete(apiHost + CUSTOMER_PATH_V1 + "/" + customerId);
     }
 }
