@@ -75,6 +75,30 @@ class MovieInfoControllerIntgTest {
     }
 
     @Test
+    void addMovieInfo_validation() {
+        MovieInfo movieInfo = new MovieInfo(null,
+                "",
+                -2005,
+                List.of("Christian Bale", "Michael Cane"),
+                LocalDate.parse("2005-06-15"));
+
+        webTestClient.post()
+                .uri(MOVIE_INFO_URL)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    String responseBody = result.getResponseBody();
+                    System.out.println(responseBody);
+                    assert responseBody != null;
+                    assertEquals("movieInfo.movieName should not be blank, movieInfo.year should not be Positive",
+                            responseBody);
+                });
+    }
+
+    @Test
     void getAllMovieInfos() {
 
         webTestClient.get()
