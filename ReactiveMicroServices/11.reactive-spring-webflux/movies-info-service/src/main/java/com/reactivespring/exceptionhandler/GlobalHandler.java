@@ -14,7 +14,7 @@ public class GlobalHandler {
 
     @ExceptionHandler(WebExchangeBindException.class)
     public ResponseEntity<String> errorHandle(WebExchangeBindException ex) {
-        String collect = ex.getBindingResult()
+        String error = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(fieldError -> {
@@ -23,7 +23,7 @@ public class GlobalHandler {
                 })
                 .sorted()
                 .collect(Collectors.joining(", "));
-        return new ResponseEntity<>(collect, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 
     }
 }
