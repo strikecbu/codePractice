@@ -124,6 +124,16 @@ class MovieInfoControllerIntgTest {
                         Objects.requireNonNull(result.getResponseBody())
                                 .getMovieName()));
     }
+    @Test
+    void getMovieInfoById_id404() {
+
+        String infoId = "def";
+        webTestClient.get()
+                .uri(MOVIE_INFO_URL + "/{id}", infoId)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
 
     @Test
     void updateMovieInfo() {
@@ -146,6 +156,22 @@ class MovieInfoControllerIntgTest {
                     assertEquals("Dark Knight Rises1", info.getMovieName());
                     assertEquals(2022, info.getYear());
                 });
+    }
+    @Test
+    void updateMovieInfo_404() {
+        MovieInfo movieInfo = new MovieInfo("def",
+                "Dark Knight Rises1",
+                2022,
+                List.of("Christian Bale", "Tom Hardy"),
+                LocalDate.parse("2012-07-20"));
+
+
+        webTestClient.put()
+                .uri(MOVIE_INFO_URL + "/{id}", "def")
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
     }
 
     @Test

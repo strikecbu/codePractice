@@ -3,6 +3,7 @@ package com.reactivespring.controller;
 import com.reactivespring.domain.MovieInfo;
 import com.reactivespring.services.MovieInfoService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -30,13 +31,19 @@ public class MovieInfoController {
     }
 
     @GetMapping("/v1/movieInfos/{id}")
-    public Mono<MovieInfo> getMovieInfoById(@PathVariable String id) {
-        return movieInfoService.getMovieInfoById(id);
+    public Mono<ResponseEntity<MovieInfo>> getMovieInfoById(@PathVariable String id) {
+        return movieInfoService.getMovieInfoById(id)
+                .map(movieInfo -> ResponseEntity.ok().body(movieInfo))
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()))
+                .log();
     }
 
     @PutMapping("/v1/movieInfos/{id}")
-    public Mono<MovieInfo> updateMovieInfo(@RequestBody MovieInfo movieInfo, @PathVariable String id) {
-        return movieInfoService.updateMovieInfo(movieInfo, id);
+    public Mono<ResponseEntity<MovieInfo>> updateMovieInfo(@RequestBody MovieInfo movieInfo, @PathVariable String id) {
+        return movieInfoService.updateMovieInfo(movieInfo, id)
+                .map(ResponseEntity::ok)
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()))
+                .log();
     }
 
     @DeleteMapping("/v1/movieInfos/{id}")
