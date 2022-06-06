@@ -108,6 +108,28 @@ class MovieInfoRepositoryIntgTest {
                 .verifyComplete();
     }
 
+    @Test
+    public void testFindByYear() {
+        Flux<MovieInfo> flux = movieInfoRepository.findByYear(2005)
+                .log();
+
+        StepVerifier.create(flux)
+                .expectNextCount(1)
+                .verifyComplete();
+    }
+    @Test
+    public void testFindByName() {
+        String batman_begins = "Batman Begins";
+        Mono<MovieInfo> mono = movieInfoRepository.findByMovieName(batman_begins)
+                .log();
+
+        StepVerifier.create(mono)
+                .assertNext(movieInfo -> {
+                    assert batman_begins.equals(movieInfo.getMovieName());
+                })
+                .verifyComplete();
+    }
+
     @AfterEach
     void tearDown() {
         movieInfoRepository.deleteAll()

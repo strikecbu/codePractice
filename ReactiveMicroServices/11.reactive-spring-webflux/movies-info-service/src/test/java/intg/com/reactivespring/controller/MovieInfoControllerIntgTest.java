@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -108,6 +110,34 @@ class MovieInfoControllerIntgTest {
                 .is2xxSuccessful()
                 .expectBodyList(MovieInfo.class)
                 .hasSize(3);
+    }
+    @Test
+    void getMovieInfosByYear() {
+        URI uri = UriComponentsBuilder.fromUriString(MOVIE_INFO_URL)
+                .queryParam("year", 2005)
+                .buildAndExpand()
+                .toUri();
+        webTestClient.get()
+                .uri(uri)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(MovieInfo.class)
+                .hasSize(1);
+    }
+    @Test
+    void getMovieInfosByName() {
+        URI uri = UriComponentsBuilder.fromUriString(MOVIE_INFO_URL)
+                .queryParam("movieName", "Batman Begins")
+                .buildAndExpand()
+                .toUri();
+        webTestClient.get()
+                .uri(uri)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(MovieInfo.class)
+                .hasSize(1);
     }
 
     @Test
