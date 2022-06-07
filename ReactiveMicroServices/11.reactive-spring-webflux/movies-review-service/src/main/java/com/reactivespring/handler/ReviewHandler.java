@@ -23,13 +23,16 @@ public class ReviewHandler {
     public Mono<ServerResponse> getAllReviews(ServerRequest req) {
         Optional<String> movieInfoId = req.queryParam("movieInfoId");
         if (movieInfoId.isPresent()) {
-            Mono<Review> mono = repository.findById(movieInfoId.get());
-            return ServerResponse.ok()
-                    .body(mono, Review.class);
+            Flux<Review> reviewFlux = repository.findByMovieInfoId(Long.parseLong(movieInfoId.get()));
+            return responseFlux(reviewFlux);
         }
         Flux<Review> flux = repository.findAll();
+        return responseFlux(flux);
+    }
+
+    private Mono<ServerResponse> responseFlux(Flux<Review> reviewFlux) {
         return ServerResponse.ok()
-                .body(flux, Review.class);
+                .body(reviewFlux, Review.class);
     }
 
     public Mono<ServerResponse> addReview(ServerRequest req) {
@@ -50,17 +53,17 @@ public class ReviewHandler {
                         }))
                 .flatMap(updatedReview -> ServerResponse.ok()
                         .bodyValue(updatedReview))
-                .switchIfEmpty(ServerResponse.badRequest()
-                        .bodyValue("Wrong id"));
+                .switchIfEmpty(ServerResponse.notFound()
+                        .build());
     }
 
     public Mono<ServerResponse> deleteReview(ServerRequest request) {
         String reviewId = request.pathVariable("id");
         return repository.findById(reviewId)
-                .flatMap(repository::delete)
-                .flatMap(nothing -> ServerResponse.noContent()
-                        .build())
-                .switchIfEmpty(ServerResponse.badRequest()
-                        .bodyValue("Wrong id"));
+                .flatMap(review -> repository.delete(review)
+                        .then(ServerResponse.noContent()
+                                .build()))
+                .switchIfEmpty(ServerResponse.notFound()
+                        .build());
     }
 }
