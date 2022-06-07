@@ -1,6 +1,7 @@
 package com.reactivespring.handler;
 
 import com.reactivespring.domain.Review;
+import com.reactivespring.exception.ReviewDataException;
 import com.reactivespring.repository.ReviewReactorRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -9,15 +10,22 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class ReviewHandler {
 
     private final ReviewReactorRepository repository;
 
-    public ReviewHandler(ReviewReactorRepository repository) {
+    private final Validator validator;
+
+    public ReviewHandler(ReviewReactorRepository repository, Validator validator) {
         this.repository = repository;
+        this.validator = validator;
     }
 
     public Mono<ServerResponse> getAllReviews(ServerRequest req) {
@@ -36,11 +44,27 @@ public class ReviewHandler {
     }
 
     public Mono<ServerResponse> addReview(ServerRequest req) {
-        Mono<Review> mono = req.bodyToMono(Review.class)
-                .flatMap(repository::save);
-        return ServerResponse.status(HttpStatus.CREATED)
-                .body(mono, Review.class);
+        return req.bodyToMono(Review.class)
+                .doOnNext(this::validator)
+                .flatMap(repository::save)
+                .flatMap(review -> ServerResponse.status(HttpStatus.CREATED)
+                        .bodyValue(review))
+                .onErrorResume(ReviewDataException.class,
+                        e -> ServerResponse.badRequest()
+                                .bodyValue(e.getMessage()));
     }
+
+    private void validator(Review review) {
+        Set<ConstraintViolation<Review>> constraintViolations = validator.validate(review);
+        if (constraintViolations.size() > 0) {
+            String errorMessage = constraintViolations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .sorted()
+                    .collect(Collectors.joining(", "));
+            throw new ReviewDataException(errorMessage);
+        }
+    }
+
 
     public Mono<ServerResponse> updateReview(ServerRequest serverRequest) {
         String id = serverRequest.pathVariable("id");

@@ -67,7 +67,8 @@ public class ReviewsIntgTest {
     @Test
     void addReview() {
         Review review = new Review(null, 1L, "WOW Movie omg", 9.0);
-        webTestClient.post().uri(API_URL)
+        webTestClient.post()
+                .uri(API_URL)
                 .bodyValue(review)
                 .exchange()
                 .expectStatus()
@@ -77,6 +78,24 @@ public class ReviewsIntgTest {
                     Review responseBody = reviewEntityExchangeResult.getResponseBody();
                     assert responseBody != null;
                     assertEquals(review.getComment(), responseBody.getComment());
+                });
+    }
+
+    @Test
+    void addReview_validate() {
+        Review review = new Review(null, null, "WOW Movie omg", -9.0);
+        webTestClient.post()
+                .uri(API_URL)
+                .bodyValue(review)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody(String.class)
+                .consumeWith(stringEntityExchangeResult -> {
+                    String responseBody = stringEntityExchangeResult.getResponseBody();
+                    assertEquals(
+                            "movieInfoId.notnull: movieInfoId is necessary not be null, rating.negative : rating is negative and please pass a non-negative value",
+                            responseBody);
                 });
     }
 
@@ -96,10 +115,12 @@ public class ReviewsIntgTest {
                     assertEquals(review.getComment(), responseBody.getComment());
                 });
     }
+
     @Test
     void updateReview_404() {
         Review review = new Review("1", 1L, "WOW Movie omg", 9.0);
-        webTestClient.put().uri(API_URL + "/{id}", "123")
+        webTestClient.put()
+                .uri(API_URL + "/{id}", "123")
                 .bodyValue(review)
                 .exchange()
                 .expectStatus()
@@ -108,14 +129,17 @@ public class ReviewsIntgTest {
 
     @Test
     void deleteReview() {
-        webTestClient.delete().uri(API_URL + "/{id}", "1")
+        webTestClient.delete()
+                .uri(API_URL + "/{id}", "1")
                 .exchange()
                 .expectStatus()
                 .isNoContent();
     }
+
     @Test
     void deleteReview_404() {
-        webTestClient.delete().uri(API_URL + "/{id}", "1123")
+        webTestClient.delete()
+                .uri(API_URL + "/{id}", "1123")
                 .exchange()
                 .expectStatus()
                 .isNotFound();

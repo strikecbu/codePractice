@@ -1,5 +1,5 @@
 # Code Practices
-## A collections of these popular courses implements on Udemy
+## Implement lecture practices of these popular Udemy courses
 * angular
 * css
 * DockerK8s
