@@ -32,7 +32,11 @@ public class ReviewHandler {
         Optional<String> movieInfoId = req.queryParam("movieInfoId");
         if (movieInfoId.isPresent()) {
             Flux<Review> reviewFlux = repository.findByMovieInfoId(Long.parseLong(movieInfoId.get()));
-            return responseFlux(reviewFlux);
+            return reviewFlux
+                    .collectList()
+                    .filter(list -> list.size() > 0)
+                    .flatMap(list -> ServerResponse.ok().bodyValue(list))
+                    .switchIfEmpty(ServerResponse.notFound().build());
         }
         Flux<Review> flux = repository.findAll();
         return responseFlux(flux);
