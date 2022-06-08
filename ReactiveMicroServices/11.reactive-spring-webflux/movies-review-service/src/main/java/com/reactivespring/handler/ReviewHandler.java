@@ -48,10 +48,10 @@ public class ReviewHandler {
                 .doOnNext(this::validator)
                 .flatMap(repository::save)
                 .flatMap(review -> ServerResponse.status(HttpStatus.CREATED)
-                        .bodyValue(review))
-                .onErrorResume(ReviewDataException.class,
-                        e -> ServerResponse.badRequest()
-                                .bodyValue(e.getMessage()));
+                        .bodyValue(review));
+//                .onErrorResume(ReviewDataException.class,
+//                        e -> ServerResponse.badRequest()
+//                                .bodyValue(e.getMessage()));
     }
 
     private void validator(Review review) {
