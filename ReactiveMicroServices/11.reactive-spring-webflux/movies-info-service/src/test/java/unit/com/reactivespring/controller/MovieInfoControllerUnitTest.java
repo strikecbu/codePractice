@@ -84,7 +84,7 @@ public class MovieInfoControllerUnitTest {
                 .expectBody(MovieInfo.class)
                 .consumeWith(result -> assertEquals("Dark Knight Rises",
                         Objects.requireNonNull(result.getResponseBody())
-                                .getMovieName()));
+                                .getName()));
     }
 
     @Test
@@ -111,7 +111,7 @@ public class MovieInfoControllerUnitTest {
                 .expectBody(MovieInfo.class)
                 .consumeWith(result -> {
                     MovieInfo info = Objects.requireNonNull(result.getResponseBody());
-                    assertEquals("Batman Begins1", info.getMovieName());
+                    assertEquals("Batman Begins1", info.getName());
                     assertEquals("MockId", info.getMovieInfoId());
                 });
 
@@ -137,7 +137,7 @@ public class MovieInfoControllerUnitTest {
                 .expectBody(MovieInfo.class)
                 .consumeWith(result -> {
                     MovieInfo info = Objects.requireNonNull(result.getResponseBody());
-                    assertEquals("Dark Knight Rises1", info.getMovieName());
+                    assertEquals("Dark Knight Rises1", info.getName());
                     assertEquals(2022, info.getYear());
                 });
     }

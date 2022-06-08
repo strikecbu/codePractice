@@ -56,7 +56,7 @@ class MovieInfoRepositoryIntgTest {
 
         StepVerifier.create(movieInfoMono)
                 .assertNext(movieInfo -> {
-                    assertEquals("Dark Knight Rises", movieInfo.getMovieName());
+                    assertEquals("Dark Knight Rises", movieInfo.getName());
                 })
                 .verifyComplete();
     }
@@ -89,7 +89,7 @@ class MovieInfoRepositoryIntgTest {
         StepVerifier.create(movieInfoMono)
                 .assertNext(mInfo -> {
                     assertNotNull(mInfo.getMovieInfoId());
-                    assertEquals("Batman Begins", mInfo.getMovieName());
+                    assertEquals("Batman Begins", mInfo.getName());
                 })
                 .verifyComplete();
     }
@@ -120,12 +120,12 @@ class MovieInfoRepositoryIntgTest {
     @Test
     public void testFindByName() {
         String batman_begins = "Batman Begins";
-        Mono<MovieInfo> mono = movieInfoRepository.findByMovieName(batman_begins)
+        Mono<MovieInfo> mono = movieInfoRepository.findByName(batman_begins)
                 .log();
 
         StepVerifier.create(mono)
                 .assertNext(movieInfo -> {
-                    assert batman_begins.equals(movieInfo.getMovieName());
+                    assert batman_begins.equals(movieInfo.getName());
                 })
                 .verifyComplete();
     }

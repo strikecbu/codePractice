@@ -8,6 +8,6 @@ import reactor.core.publisher.Mono;
 public interface MovieInfoRepository extends ReactiveMongoRepository<MovieInfo, String> {
     Flux<MovieInfo> findByYear(Integer year);
 
-    Mono<MovieInfo> findByMovieName(String movieName);
+    Mono<MovieInfo> findByName(String movieName);
 
 }

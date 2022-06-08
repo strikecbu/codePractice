@@ -20,7 +20,7 @@ public class MovieInfo {
     @Id
     private String movieInfoId;
     @NotBlank(message = "movieInfo.movieName should not be blank")
-    private String movieName;
+    private String name;
     @NotNull
     @Positive(message = "movieInfo.year should not be Positive")
     private Integer year;
