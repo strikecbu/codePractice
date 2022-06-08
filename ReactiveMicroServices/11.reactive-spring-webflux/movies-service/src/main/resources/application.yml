@@ -1,5 +1,8 @@
 spring:
   profiles:
     active: local
+apiUrl:
+  movieInfo: http://localhost:8080/v1/movieInfos
+  movieView: http://localhost:8081/v1/reviews
 server:
   port: 8082
