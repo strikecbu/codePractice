@@ -1,6 +1,7 @@
 package com.reactivespring.errorhandler;
 
 import com.reactivespring.exception.MoviesInfoClientException;
+import com.reactivespring.exception.ReviewsClientException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,6 +17,10 @@ public class ClientErrorHandler {
             return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage()));
         }
         return Mono.just(ResponseEntity.status(ex.getStatusCode()).body(ex.getMessage()));
+    }
+    @ExceptionHandler(ReviewsClientException.class)
+    public Mono<ResponseEntity<String>> reviewNotFound(ReviewsClientException ex) {
+        return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage()));
     }
     @ExceptionHandler(RuntimeException.class)
     public Mono<ResponseEntity<String>> runtimeEx(RuntimeException ex) {
