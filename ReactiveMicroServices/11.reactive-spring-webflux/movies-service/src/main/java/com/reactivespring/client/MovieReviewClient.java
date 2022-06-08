@@ -3,6 +3,7 @@ package com.reactivespring.client;
 import com.reactivespring.domain.Review;
 import com.reactivespring.exception.ReviewsClientException;
 import com.reactivespring.exception.ReviewsServerException;
+import com.reactivespring.util.RetryUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,7 @@ public class MovieReviewClient {
                 .onStatus(HttpStatus::is5xxServerError, res -> res.bodyToMono(String.class)
                         .flatMap(message -> Mono.error(new ReviewsServerException(message))))
                 .bodyToFlux(Review.class)
+                .retryWhen(RetryUtil.getSpec())
                 .log();
     }
 }

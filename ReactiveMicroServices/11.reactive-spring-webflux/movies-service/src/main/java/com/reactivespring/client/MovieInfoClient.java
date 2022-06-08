@@ -3,6 +3,8 @@ package com.reactivespring.client;
 import com.reactivespring.domain.MovieInfo;
 import com.reactivespring.exception.MoviesInfoClientException;
 import com.reactivespring.exception.MoviesInfoServerException;
+import com.reactivespring.util.RetryUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -10,7 +12,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-public class MovieInfoClient{
+@Slf4j
+public class MovieInfoClient {
 
     private final WebClient webClient;
 
@@ -23,6 +26,7 @@ public class MovieInfoClient{
 
     public Mono<MovieInfo> getMovieInfoById(String movieId) {
         String url = apiUrl.concat("/{id}");
+
         return webClient.get()
                 .uri(url, movieId)
                 .retrieve()
@@ -36,9 +40,14 @@ public class MovieInfoClient{
                     return res.bodyToMono(String.class)
                             .flatMap(message -> Mono.error(new MoviesInfoClientException(message, httpStatus.value())));
                 })
-                .onStatus(HttpStatus::is5xxServerError, res -> res.bodyToMono(String.class)
-                        .flatMap(message -> Mono.error(new MoviesInfoServerException(message))))
+                .onStatus(HttpStatus::is5xxServerError, res -> {
+                    HttpStatus status = res.statusCode();
+                    log.info("Error Status: {}", status);
+                    return res.bodyToMono(String.class)
+                            .flatMap(message -> Mono.error(new MoviesInfoServerException(message)));
+                })
                 .bodyToMono(MovieInfo.class)
+                .retryWhen(RetryUtil.getSpec())
                 .log();
     }
 }
