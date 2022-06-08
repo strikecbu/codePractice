@@ -1,8 +1,8 @@
 package com.reactivespring.client;
 
 import com.reactivespring.domain.Review;
-import com.reactivespring.exception.MoviesInfoClientException;
-import com.reactivespring.exception.MoviesInfoServerException;
+import com.reactivespring.exception.ReviewsClientException;
+import com.reactivespring.exception.ReviewsServerException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -36,15 +36,15 @@ public class MovieReviewClient {
                 .onStatus(HttpStatus::is4xxClientError, res -> {
                     HttpStatus httpStatus = res.statusCode();
                     if (httpStatus.equals(HttpStatus.NOT_FOUND)) {
-                        return Mono.error(new MoviesInfoClientException(
-                                "Not found any review data from id: " + movieId,
-                                httpStatus.value()));
+                        return Mono.error(new ReviewsClientException(
+                                "Not found any review data from id: " + movieId));
                     }
                     return res.bodyToMono(String.class)
-                            .flatMap(message -> Mono.error(new MoviesInfoClientException(message, httpStatus.value())));
+                            .flatMap(message -> Mono.error(new ReviewsClientException(message)));
                 })
                 .onStatus(HttpStatus::is5xxServerError, res -> res.bodyToMono(String.class)
-                        .flatMap(message -> Mono.error(new MoviesInfoServerException(message))))
-                .bodyToFlux(Review.class).log();
+                        .flatMap(message -> Mono.error(new ReviewsServerException(message))))
+                .bodyToFlux(Review.class)
+                .log();
     }
 }
