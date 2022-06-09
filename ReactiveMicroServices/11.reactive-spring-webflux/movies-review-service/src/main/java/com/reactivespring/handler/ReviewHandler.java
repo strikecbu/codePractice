@@ -4,11 +4,13 @@ import com.reactivespring.domain.Review;
 import com.reactivespring.exception.ReviewDataException;
 import com.reactivespring.repository.ReviewReactorRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -23,6 +25,10 @@ public class ReviewHandler {
 
     private final Validator validator;
 
+    private final Sinks.Many<Review> reviewSink = Sinks.many()
+            .replay()
+            .latest();
+
     public ReviewHandler(ReviewReactorRepository repository, Validator validator) {
         this.repository = repository;
         this.validator = validator;
@@ -35,8 +41,10 @@ public class ReviewHandler {
             return reviewFlux
                     .collectList()
                     .filter(list -> list.size() > 0)
-                    .flatMap(list -> ServerResponse.ok().bodyValue(list))
-                    .switchIfEmpty(ServerResponse.notFound().build());
+                    .flatMap(list -> ServerResponse.ok()
+                            .bodyValue(list))
+                    .switchIfEmpty(ServerResponse.notFound()
+                            .build());
         }
         Flux<Review> flux = repository.findAll();
         return responseFlux(flux);
@@ -51,6 +59,7 @@ public class ReviewHandler {
         return req.bodyToMono(Review.class)
                 .doOnNext(this::validator)
                 .flatMap(repository::save)
+                .doOnNext(reviewSink::tryEmitNext)
                 .flatMap(review -> ServerResponse.status(HttpStatus.CREATED)
                         .bodyValue(review));
 //                .onErrorResume(ReviewDataException.class,
@@ -93,5 +102,20 @@ public class ReviewHandler {
                                 .build()))
                 .switchIfEmpty(ServerResponse.notFound()
                         .build());
+    }
+
+    public Mono<ServerResponse> getReviewStream(ServerRequest request) {
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_NDJSON)
+                .body(reviewSink.asFlux(), Review.class);
+    }
+
+    public Mono<ServerResponse> getReviewStreamByInfoId(ServerRequest request) {
+        Long movieInfoId = Long.parseLong(request.pathVariable("id"));
+        Flux<Review> flux = reviewSink.asFlux()
+                .filter(review -> review.getMovieInfoId().equals(movieInfoId));
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_NDJSON)
+                .body(flux, Review.class);
     }
 }

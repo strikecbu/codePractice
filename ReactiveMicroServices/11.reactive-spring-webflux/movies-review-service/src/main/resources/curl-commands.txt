@@ -21,6 +21,10 @@ GET-ALL-REVIEWS:
 ----------------
 curl -i http://localhost:8081/v1/reviews
 
+GET-REVIEWS-STREAM:
+----------------
+curl -i http://localhost:8081/v1/reviews/stream
+
 
 UPDATE-REVIEW:
 ----------------

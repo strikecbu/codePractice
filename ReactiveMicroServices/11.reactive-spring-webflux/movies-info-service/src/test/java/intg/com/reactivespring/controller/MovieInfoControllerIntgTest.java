@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -111,6 +113,7 @@ class MovieInfoControllerIntgTest {
                 .expectBodyList(MovieInfo.class)
                 .hasSize(3);
     }
+
     @Test
     void getMovieInfosByYear() {
         URI uri = UriComponentsBuilder.fromUriString(MOVIE_INFO_URL)
@@ -125,6 +128,7 @@ class MovieInfoControllerIntgTest {
                 .expectBodyList(MovieInfo.class)
                 .hasSize(1);
     }
+
     @Test
     void getMovieInfosByName() {
         URI uri = UriComponentsBuilder.fromUriString(MOVIE_INFO_URL)
@@ -154,6 +158,7 @@ class MovieInfoControllerIntgTest {
                         Objects.requireNonNull(result.getResponseBody())
                                 .getName()));
     }
+
     @Test
     void getMovieInfoById_id404() {
 
@@ -187,6 +192,7 @@ class MovieInfoControllerIntgTest {
                     assertEquals(2022, info.getYear());
                 });
     }
+
     @Test
     void updateMovieInfo_404() {
         MovieInfo movieInfo = new MovieInfo("def",
@@ -214,5 +220,42 @@ class MovieInfoControllerIntgTest {
                 .expectStatus()
                 .isNoContent()
                 .expectBody(Void.class);
+    }
+
+    @Test
+    void getAllMovieInfos_stream() {
+
+        MovieInfo movieInfo = new MovieInfo(null,
+                "Batman Begins1",
+                2005,
+                List.of("Christian Bale", "Michael Cane"),
+                LocalDate.parse("2005-06-15"));
+
+        webTestClient.post()
+                .uri(MOVIE_INFO_URL)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isCreated()
+                .expectBody(MovieInfo.class)
+                .consumeWith(result -> assertEquals("Batman Begins1",
+                        Objects.requireNonNull(result.getResponseBody())
+                                .getName()));
+
+        Flux<MovieInfo> responseBody = webTestClient.get()
+                .uri(MOVIE_INFO_URL + "/stream")
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .returnResult(MovieInfo.class)
+                .getResponseBody()
+                .log();
+
+        StepVerifier.create(responseBody)
+                .assertNext(info -> {
+                    assertEquals(info.getName(), movieInfo.getName());
+                })
+                .thenCancel()
+                .verify();
     }
 }

@@ -49,4 +49,18 @@ public class MovieReviewClient {
                 .retryWhen(RetryUtil.getSpec())
                 .log();
     }
+    public Flux<Review> getReviewsStreamByMovieId(String movieId) {
+        URI uri = UriComponentsBuilder.fromUriString(apiUrl + "/stream")
+                .queryParam("movieInfoId", movieId)
+                .buildAndExpand()
+                .toUri();
+        return webClient.get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatus::is5xxServerError, res -> res.bodyToMono(String.class)
+                        .flatMap(message -> Mono.error(new ReviewsServerException(message))))
+                .bodyToFlux(Review.class)
+                .retryWhen(RetryUtil.getSpec())
+                .log();
+    }
 }
