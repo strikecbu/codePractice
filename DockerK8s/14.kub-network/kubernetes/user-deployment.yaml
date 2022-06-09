@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-app
+spec:
+  selector:
+    matchLabels:
+      app: user-app
+  replicas: 1     
+  template:
+    metadata:
+      labels:
+        app: user-app    
+    spec:
+      containers:
+      - name: user-app
+        image: andychentw/kube-network-user:latest
+        env:
+          - name: AUTH_HOST
+            value: localhost
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+      - name: user-auth
+        image: andychentw/kube-network-auth:latest
+        resources:
+          limits:
+            memory: "128Mi"  
+            cpu: "500m"
+        ports:
+          - containerPort: 80   
