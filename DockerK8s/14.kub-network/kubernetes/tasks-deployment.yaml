@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasks-app
+spec:
+  selector:
+    matchLabels:
+      app: tasks-app
+  replicas: 1    
+  template:
+    metadata:
+      labels:
+        app: tasks-app
+    spec:
+      containers:
+      - name: tasks-app
+        image: andychentw/kube-network-tasks:latest
+        volumeMounts:
+          - mountPath: /app/tasks
+            name: tasks-vol
+        env:
+          - name: TASKS_FOLDER
+            value: tasks
+          - name: AUTH_HOST
+            value: "auth-app-service.default"
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8000
+      volumes:
+        - name: tasks-vol
+          hostPath:
+            path: /data/tasks
+            type: DirectoryOrCreate
+                
