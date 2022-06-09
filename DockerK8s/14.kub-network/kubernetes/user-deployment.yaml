@@ -17,18 +17,10 @@ spec:
         image: andychentw/kube-network-user:latest
         env:
           - name: AUTH_HOST
-            value: localhost
+            value: "auth-app-service.default"
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
         ports:
         - containerPort: 8080
-      - name: user-auth
-        image: andychentw/kube-network-auth:latest
-        resources:
-          limits:
-            memory: "128Mi"  
-            cpu: "500m"
-        ports:
-          - containerPort: 80   
