@@ -20,12 +20,18 @@ public class RouterConfig {
 
     @Bean
     public RouterFunction<ServerResponse> reviewRouter() {
-        return route().GET("/v1/hello",
+        return route()
+                .GET("/v1/hello",
                         (req -> ServerResponse.ok()
                                 .bodyValue("Hello World")))
                 .nest(path("/v1/reviews"),
                         () -> route()
-                                .GET( handler::getAllReviews)
+                                .nest(path("/stream"),
+                                        () -> route()
+                                                .GET(handler::getReviewStream)
+                                                .GET("/{id}", handler::getReviewStreamByInfoId)
+                                                .build())
+                                .GET(handler::getAllReviews)
                                 .POST(handler::addReview)
                                 .PUT("/{id}", handler::updateReview)
                                 .DELETE("/{id}", handler::deleteReview)
