@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-app
+spec:
+  selector:
+    matchLabels:
+      app: frontend-app
+  replicas: 1     
+  template:
+    metadata:
+      labels:
+        app: frontend-app    
+    spec:
+      containers:
+      - name: frontend-app
+        image: andychentw/kube-network-frontend:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
