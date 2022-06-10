@@ -5,13 +5,19 @@ import guru.springframework.msscbrewery.web.model.v2.BeerDtoV2;
 import guru.springframework.msscbrewery.web.model.v2.BeerStyleEnum;
 import org.junit.jupiter.api.Test;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 class BeerMapperTest {
 
     @Test
-    void beerDtoToBeer() {
+    void beerDtoToBeer() throws ParseException {
         BeerDtoV2 drink = BeerDtoV2.builder()
                 .beerName("GOOD to drink")
                 .beerStyle(BeerStyleEnum.ALE)

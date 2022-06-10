@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Size;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Data
@@ -16,4 +17,6 @@ public class Customer {
     private UUID id;
     @Size(min = 3, max = 100, message = "name should be 3 ~ 100 characters")
     private String name;
+
+    private Timestamp updateTime;
 }

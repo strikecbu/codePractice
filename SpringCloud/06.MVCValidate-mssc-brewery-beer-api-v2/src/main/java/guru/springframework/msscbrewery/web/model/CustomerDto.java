@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -22,4 +23,6 @@ public class CustomerDto {
     private UUID id;
     @Size(min = 3, max = 100, message = "name should be 3 ~ 100 characters")
     private String name;
+
+    private LocalDateTime updateTime;
 }
