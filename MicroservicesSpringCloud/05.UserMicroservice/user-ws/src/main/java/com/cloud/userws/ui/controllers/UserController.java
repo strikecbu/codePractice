@@ -19,7 +19,7 @@ public class UserController {
         return status;
     }
 
-    @GetMapping(value = "/check/status", produces = {MediaType.APPLICATION_NDJSON_VALUE})
+    @GetMapping(value = "/status/check", produces = {MediaType.APPLICATION_NDJSON_VALUE})
     public Flux<String> healthCheck() {
         return status.asFlux();
     }
