@@ -5,6 +5,19 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      routes:
+        - id: users-status-check
+          uri: lb://users-ws
+          predicates:
+            - Method=GET
+            - Path=/users-aka/users/status/check
+          filters:
+            - RewritePath=/users-aka/(?<somePath>.*), /$\{somePath}
+#        - id: account-status-check
+#          uri: lb://accounts-ws
+#          predicates:
+#            - Method=GET
+#            - Path=/accounts/status/check
       discovery:
         locator:
           enabled: true
