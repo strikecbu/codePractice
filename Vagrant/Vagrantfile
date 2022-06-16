@@ -1,0 +1,27 @@
+Vagrant.configure("2") do |config|
+    config.vm.provision "shell", inline: "echo Hello"
+   
+    # (1..3).each do |i|
+        config.vm.define "kube-1" do |kube|
+            config.vm.box = "ubuntu/xenial64"
+            config.vm.hostname="kube1"
+            config.ssh.insert_key=true
+            config.vm.network "public_network"
+        end
+        config.vm.provider "virtualbox" do |vb|
+            # Customize the amount of memory on the VM:
+            vb.memory = "4096"
+            vb.cpus = "12"
+        end
+      # end
+
+    # config.vm.define "kube1" do |kube1|
+    #   config.vm.box = "ubuntu/xenial64"
+    #   config.ssh.insert_key=true
+    #   config.ssh.verify_host_key
+    # end
+   
+    # config.vm.define "db" do |db|
+    #   db.vm.box = "mysql"
+    # end
+  end
