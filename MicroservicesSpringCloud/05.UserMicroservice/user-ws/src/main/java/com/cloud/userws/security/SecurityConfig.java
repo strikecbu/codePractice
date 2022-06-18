@@ -21,15 +21,22 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity) {
+     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity, SecurityManagement management, SecurityRepository repository) {
 
         return httpSecurity
+                .exceptionHandling()
+                .authenticationEntryPoint(management::handleAuthentication)
+                .accessDeniedHandler(management::handleAccessDenied)
+                .and()
                 .authorizeExchange()
-                .pathMatchers("/users/**")
-                .hasIpAddress(gatewayIp)
                 .pathMatchers("/auth/**")
                 .permitAll()
+                .pathMatchers("/users/**")
+                .authenticated()
+//                .hasIpAddress(gatewayIp)
                 .and()
+                .authenticationManager(management)
+                .securityContextRepository(repository)
                 .csrf()
                 .disable()
                 .build();

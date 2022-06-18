@@ -3,6 +3,8 @@ package com.cloud.userws.ui.handlers;
 import com.cloud.userws.mapper.UserMapper;
 import com.cloud.userws.repository.UserRepository;
 import org.springframework.core.env.Environment;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -30,6 +32,8 @@ public class UserHandler {
     }
 
     public Mono<ServerResponse> getUserById(ServerRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
         String userId = request.pathVariable("userId");
         return userRepository.findByPublicId(userId)
                 .map(userMapper::entityToResponse)
