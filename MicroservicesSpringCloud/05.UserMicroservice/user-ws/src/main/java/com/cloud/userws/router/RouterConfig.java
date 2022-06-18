@@ -27,7 +27,8 @@ public class RouterConfig {
     public RouterFunction<ServerResponse> userRoute() {
         return RouterFunctions.route()
                 .nest(path("/users"), builder ->
-                        builder.GET("/status/check", userHandler::statusCheck))
+                        builder.GET("/status/check", userHandler::statusCheck)
+                                .GET("/{userId}", userHandler::getUserById))
                 .build();
     }
 
