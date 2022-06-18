@@ -28,8 +28,8 @@ public class PersistConfig {
                 .build());
     }
 
-    @Bean
-    R2dbcEntityTemplate r2dbcEntityTemplate(ConnectionFactory connectionFactory) {
-        return new R2dbcEntityTemplate(connectionFactory);
-    }
+//    @Bean
+//    R2dbcEntityTemplate r2dbcEntityTemplate(ConnectionFactory connectionFactory) {
+//        return new R2dbcEntityTemplate(connectionFactory);
+//    }
 }
