@@ -4,6 +4,7 @@ import com.cloud.userws.domain.UserEntity;
 import com.cloud.userws.mapper.UserMapper;
 import com.cloud.userws.repository.UserRepository;
 import com.cloud.userws.shared.UserDto;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -15,9 +16,12 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final UserRepository repository;
 
-    public UserServiceImpl(UserMapper userMapper, UserRepository repository) {
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
+
+    public UserServiceImpl(UserMapper userMapper, UserRepository repository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.userMapper = userMapper;
         this.repository = repository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
 
@@ -28,7 +32,6 @@ public class UserServiceImpl implements UserService {
                 .doOnNext(data -> {
                     data.setPublicId(UUID.randomUUID().toString());
                 })
-                .flatMap(repository::save);
-
+                .flatMap(r2dbcEntityTemplate::insert);
     }
 }

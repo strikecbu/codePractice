@@ -4,12 +4,12 @@ spring:
   application:
     name: users-ws
 
-  r2dbc:
-    url: r2dbc:postgres://localhost:5432/postgres
-    username: postgres
-    password: p@ssw0rd
-    properties:
-      schema: public
+#  r2dbc:
+#    url: r2dbc:postgres://localhost:5432/postgres
+#    username: postgres
+#    password: p@ssw0rd
+#    properties:
+#      schema: public
 eureka:
   client:
     service-url:
