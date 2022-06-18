@@ -20,6 +20,6 @@ eureka:
 gateway:
   ip: 192.168.0.105
 token:
-  secret: kkklasadfffdddd
+  secret: kkklasadfffddddkklodlwoelwlelwks33kkklasadfffddddkklodlwoelwlelwks33kkklasadfffddddkklodlwoelwlelwks99
   expired:
     time: 10
