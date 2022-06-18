@@ -7,4 +7,6 @@ import reactor.core.publisher.Mono;
 public interface UserService {
 
     Mono<UserEntity> createUser(UserDto userDto);
+
+    Mono<UserEntity> findUserByEmail(String email);
 }

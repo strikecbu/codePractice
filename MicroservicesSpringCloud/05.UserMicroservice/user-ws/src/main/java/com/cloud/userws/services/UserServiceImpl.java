@@ -30,4 +30,9 @@ public class UserServiceImpl implements UserService {
                         .toString()))
                 .flatMap(repository::save);
     }
+
+    @Override
+    public Mono<UserEntity> findUserByEmail(String email) {
+        return repository.findByEmail(email);
+    }
 }

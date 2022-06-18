@@ -43,10 +43,10 @@ public class UserController {
         return status.asFlux();
     }
 
-    @GetMapping(value = "/status/check")
-    public Mono<String> healthCheck() {
-        return Mono.just("Working on port: " + environment.getProperty("local.server.port"));
-    }
+//    @GetMapping(value = "/status/check")
+//    public Mono<String> healthCheck() {
+//        return Mono.just("Working on port: " + environment.getProperty("local.server.port"));
+//    }
 
     @PostMapping
     public Mono<ResponseEntity<UserResponseModel>> createUser(@Validated @RequestBody Mono<UserRequestModel> requestModel) {
