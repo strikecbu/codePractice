@@ -5,7 +5,9 @@ import com.cloud.userws.services.UserService;
 import com.cloud.userws.ui.model.UserRequestModel;
 import com.cloud.userws.ui.model.UserResponseModel;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -47,9 +49,10 @@ public class UserController {
     }
 
     @PostMapping
-    public Mono<UserResponseModel> createUser(@Validated @RequestBody Mono<UserRequestModel> requestModel) {
+    public Mono<ResponseEntity<UserResponseModel>> createUser(@Validated @RequestBody Mono<UserRequestModel> requestModel) {
         return requestModel.map(userMapper::requestToDto)
                 .flatMap(userService::createUser)
-                .map(userMapper::entityToResponse);
+                .map(userMapper::entityToResponse)
+                .map(user -> new ResponseEntity<>(user, HttpStatus.CREATED));
     }
 }
