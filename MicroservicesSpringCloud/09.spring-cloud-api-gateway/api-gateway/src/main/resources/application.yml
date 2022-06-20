@@ -11,13 +11,47 @@ spring:
           predicates:
             - Method=GET
             - Path=/users-aka/users/status/check
+            - Header=Authorization,Bearer (.*)
           filters:
+            - RemoveRequestHeader=Cookie
             - RewritePath=/users-aka/(?<somePath>.*), /$\{somePath}
-#        - id: account-status-check
-#          uri: lb://accounts-ws
-#          predicates:
-#            - Method=GET
-#            - Path=/accounts/status/check
+            - AuthorizationHeader
+
+        - id: users-signup
+          uri: lb://users-ws
+          predicates:
+            - Method=POST
+            - Path=/users-aka/users
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/users-aka/(?<somePath>.*), /$\{somePath}
+
+
+        - id: users-login
+          uri: lb://users-ws
+          predicates:
+            - Method=POST
+            - Path=/users-aka/auth/login
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/users-aka/(?<somePath>.*), /$\{somePath}
+
+        - id: users-query-update-delete
+          uri: lb://users-ws
+          predicates:
+            - Method=GET,PUT,DELETE
+            - Path=/users-aka/auth/login
+            - Header=Authorization,Bearer (.*)
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/users-aka/(?<somePath>.*), /$\{somePath}
+            - AuthorizationHeader
+
+      #        - id: account-status-check
+      #          uri: lb://accounts-ws
+      #          predicates:
+      #            - Method=GET
+      #            - Path=/accounts/status/check
       discovery:
         locator:
           enabled: true
@@ -26,3 +60,5 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8010/eureka
+token:
+  secret: Ss9pnhMZp+dFrlasNNIWvtFOXpTYQHEYQ9OlyydBkqk=
