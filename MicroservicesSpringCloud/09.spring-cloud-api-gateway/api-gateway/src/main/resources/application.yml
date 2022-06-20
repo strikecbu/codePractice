@@ -27,11 +27,11 @@ spring:
             - RewritePath=/users-aka/(?<somePath>.*), /$\{somePath}
 
 
-        - id: users-login
+        - id: users-login-signup
           uri: lb://users-ws
           predicates:
             - Method=POST
-            - Path=/users-aka/auth/login
+            - Path=/users-aka/auth/**
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/users-aka/(?<somePath>.*), /$\{somePath}
@@ -40,7 +40,7 @@ spring:
           uri: lb://users-ws
           predicates:
             - Method=GET,PUT,DELETE
-            - Path=/users-aka/auth/login
+            - Path=/users-aka/users/**
             - Header=Authorization,Bearer (.*)
           filters:
             - RemoveRequestHeader=Cookie
@@ -52,10 +52,10 @@ spring:
       #          predicates:
       #            - Method=GET
       #            - Path=/accounts/status/check
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
+#      discovery:
+#        locator:
+#          enabled: true
+#          lower-case-service-id: true
 eureka:
   client:
     service-url:

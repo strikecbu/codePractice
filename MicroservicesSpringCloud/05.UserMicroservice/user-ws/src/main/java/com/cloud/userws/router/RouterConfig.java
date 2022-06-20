@@ -36,7 +36,8 @@ public class RouterConfig {
     public RouterFunction<ServerResponse> authRoute() {
         return RouterFunctions.route()
                 .nest(path("/auth"), builder ->
-                        builder.POST("/login", securityHandler::login))
+                        builder.POST("/login", securityHandler::login)
+                                .POST("/signup", securityHandler::signup))
                 .build();
     }
 
