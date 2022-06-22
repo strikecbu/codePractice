@@ -1,16 +1,14 @@
 package com.eazybytes.loans.repository;
 
-import java.util.List;
-
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
-
 import com.eazybytes.loans.model.Loans;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
 @Repository
-public interface LoansRepository extends CrudRepository<Loans, Long> {
+public interface LoansRepository extends ReactiveCrudRepository<Loans, Long> {
 
-	
-	List<Loans> findByCustomerIdOrderByStartDtDesc(int customerId);
+
+    Flux<Loans> findByCustomerIdOrderByStartDtDesc(int customerId);
 
 }

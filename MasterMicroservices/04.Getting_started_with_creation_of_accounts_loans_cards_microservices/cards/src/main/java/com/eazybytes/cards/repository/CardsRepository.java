@@ -1,16 +1,14 @@
 package com.eazybytes.cards.repository;
 
-import java.util.List;
-
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
-
 import com.eazybytes.cards.model.Cards;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
 @Repository
-public interface CardsRepository extends CrudRepository<Cards, Long> {
+public interface CardsRepository extends ReactiveCrudRepository<Cards, Long> {
 
-	
-	List<Cards> findByCustomerId(int customerId);
+
+    Flux<Cards> findByCustomerId(int customerId);
 
 }

@@ -9,7 +9,9 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RequestContextInterceptor implements ClientHttpRequestInterceptor {
 
 	private static final Logger logger = LoggerFactory.getLogger(RequestContextInterceptor.class);
@@ -19,7 +21,7 @@ public class RequestContextInterceptor implements ClientHttpRequestInterceptor {
 			throws IOException {
 
 		HttpHeaders headers = request.getHeaders();
-		headers.add(RequestContext.CORRELATION_ID, RequestContextHolder.getContext().getCorrelationId());
+		headers.add(RequestContext.CORRELATION_ID, "some id");
 
 		return execution.execute(request, body);
 	}

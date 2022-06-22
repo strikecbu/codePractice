@@ -1,20 +1,22 @@
 package com.eazybytes.loans;
 
+import io.r2dbc.spi.ConnectionFactories;
+import io.r2dbc.spi.ConnectionFactory;
+import io.r2dbc.spi.ConnectionFactoryOptions;
+import io.r2dbc.spi.Option;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScans;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.r2dbc.config.EnableR2dbcAuditing;
+
+import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 
 @SpringBootApplication
-@ComponentScans({ @ComponentScan("com.eazybytes.loans.controller") })
-@EnableJpaRepositories("com.eazybytes.loans.repository")
-@EntityScan("com.eazybytes.loans.model")
 public class LoansApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(LoansApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(LoansApplication.class, args);
+    }
+
 
 }

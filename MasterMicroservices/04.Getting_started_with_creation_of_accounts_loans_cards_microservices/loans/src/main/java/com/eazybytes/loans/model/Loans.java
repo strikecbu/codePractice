@@ -2,44 +2,41 @@ package com.eazybytes.loans.model;
 
 import java.sql.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
 @Getter @Setter @ToString
+@Table("loans")
 public class Loans {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "loan_number")
+	@Column("loan_number")
 	private int loanNumber;
 	
-	@Column(name = "customer_id")
+	@Column("customer_id")
 	private int customerId;
 	
-	@Column(name="start_dt")
+	@Column("start_dt")
 	private Date startDt;
 	
-	@Column(name = "loan_type")
+	@Column("loan_type")
 	private String loanType;
 	
-	@Column(name = "total_loan")
+	@Column("total_loan")
 	private int totalLoan;
 	
-	@Column(name = "amount_paid")
+	@Column("amount_paid")
 	private int amountPaid;
 	
-	@Column(name = "outstanding_amount")
+	@Column("outstanding_amount")
 	private int outstandingAmount;
 	
-	@Column(name = "create_dt")
-	private String createDt;
+	@Column("create_dt")
+	private Date createDt;
 	
 }
