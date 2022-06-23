@@ -3,6 +3,8 @@ server:
 spring:
   application:
     name: users-ws
+  config:
+    import: "optional:configserver:http://localhost:8012"
 
 #  r2dbc:
 #    url: r2dbc:postgres://localhost:5432/postgres
@@ -11,9 +13,9 @@ spring:
 #    properties:
 #      schema: public
 eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8010/eureka
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8099/eureka
   instance:
     instance-id: ${spring.application.name}:${${spring.application_name}:${random.value}}
 
