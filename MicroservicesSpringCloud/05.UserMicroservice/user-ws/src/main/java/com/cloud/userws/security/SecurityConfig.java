@@ -29,6 +29,8 @@ public class SecurityConfig {
                 .accessDeniedHandler(management::handleAccessDenied)
                 .and()
                 .authorizeExchange()
+                .pathMatchers("/actuator/**")
+                .permitAll()
                 .pathMatchers("/auth/**")
                 .permitAll()
                 .pathMatchers("/users/**")

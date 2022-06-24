@@ -6,6 +6,8 @@ spring:
   config:
     import: "optional:configserver:http://localhost:8012"
 
+ui:
+  title: Hello Andy self
 #  r2dbc:
 #    url: r2dbc:postgres://localhost:5432/postgres
 #    username: postgres
@@ -25,3 +27,8 @@ token:
   secret: Ss9pnhMZp+dFrlasNNIWvtFOXpTYQHEYQ9OlyydBkqk=
   expired:
     time: 10
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,mappings

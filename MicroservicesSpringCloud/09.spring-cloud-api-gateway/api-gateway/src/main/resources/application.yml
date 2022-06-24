@@ -54,13 +54,18 @@ spring:
       #          predicates:
       #            - Method=GET
       #            - Path=/accounts/status/check
-#      discovery:
-#        locator:
-#          enabled: true
-#          lower-case-service-id: true
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
 #eureka:
 #  client:
 #    service-url:
 #      defaultZone: http://localhost:8010/eureka
 token:
   secret: Ss9pnhMZp+dFrlasNNIWvtFOXpTYQHEYQ9OlyydBkqk=
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,httptrace,gateway,beans
