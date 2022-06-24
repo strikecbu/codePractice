@@ -3,10 +3,10 @@
 #    service-url:
 #      defaultZone: http://localhost:8010/eureka
 #
-#token:
+token:
 #  secret: Ss9pnhMZp+dFrlasNNIWvtFOXpTYQHEYQ9OlyydBkqk=
-#  expired:
-#    time: 5
+  expired:
+    time: 30
 
 ui:
   title: HelloUUUAndy
