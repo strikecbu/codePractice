@@ -28,7 +28,8 @@ public class UserHandler {
 
     public Mono<ServerResponse> statusCheck(ServerRequest request) {
         return ServerResponse.ok()
-                .bodyValue("Working on port: " + environment.getProperty("local.server.port"));
+                .bodyValue("Working on port: " + environment.getProperty("local.server.port") + ", title: " +
+                        environment.getProperty("ui.title"));
     }
 
     public Mono<ServerResponse> getUserById(ServerRequest request) {
@@ -37,7 +38,9 @@ public class UserHandler {
         String userId = request.pathVariable("userId");
         return userRepository.findByPublicId(userId)
                 .map(userMapper::entityToResponse)
-                .flatMap(resp -> ServerResponse.ok().bodyValue(resp))
-                .switchIfEmpty(ServerResponse.notFound().build());
+                .flatMap(resp -> ServerResponse.ok()
+                        .bodyValue(resp))
+                .switchIfEmpty(ServerResponse.notFound()
+                        .build());
     }
 }
