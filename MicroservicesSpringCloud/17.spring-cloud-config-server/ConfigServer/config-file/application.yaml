@@ -1,0 +1,19 @@
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8010/eureka
+#
+#token:
+#  secret: Ss9pnhMZp+dFrlasNNIWvtFOXpTYQHEYQ9OlyydBkqk=
+#  expired:
+#    time: 5
+
+ui:
+  title: HelloUUUAndy
+
+#spring:
+#  rabbitmq:
+#    host: localhost
+#    port: 5672
+#    username: guest
+#    password: guest
