@@ -3,15 +3,15 @@
  */
 package com.eazybytes.cards.controller;
 
-import java.util.List;
+import java.util.Properties;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.eazybytes.cards.config.ConfigProperties;
 import org.springframework.web.bind.annotation.*;
 
 import com.eazybytes.cards.model.Cards;
-import com.eazybytes.cards.model.Customer;
 import com.eazybytes.cards.repository.CardsRepository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Eazy Bytes
@@ -24,13 +24,26 @@ public class CardsController {
 
 	private final CardsRepository cardsRepository;
 
-	public CardsController(CardsRepository cardsRepository) {
+	private final ConfigProperties configProperties;
+
+	public CardsController(CardsRepository cardsRepository, ConfigProperties configProperties) {
 		this.cardsRepository = cardsRepository;
+		this.configProperties = configProperties;
 	}
 
 	@GetMapping()
 	public Flux<Cards> getCardDetails(@RequestParam Integer custId) {
 		return cardsRepository.findByCustomerId(custId);
+	}
+
+	@GetMapping("/properties")
+	public Mono<Properties> getConfig() {
+		Properties properties = new Properties();
+		properties.put("msg", configProperties.getMsg());
+		properties.put("buildVersion", configProperties.getBuildVersion());
+		properties.put("mailDetails", configProperties.getMailDetails());
+		properties.put("activeBranches", configProperties.getActiveBranches());
+		return Mono.just(properties);
 	}
 
 }

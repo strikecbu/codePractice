@@ -1,17 +1,14 @@
 /**
- * 
+ *
  */
 package com.eazybytes.loans.config;
 
-import java.util.List;
-import java.util.Map;
-
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Eazy Bytes
@@ -19,12 +16,12 @@ import lombok.ToString;
  */
 @Configuration
 @ConfigurationProperties(prefix = "loans")
-@Getter @Setter @ToString
+@Data
 public class LoansServiceConfig {
 
-	 private String msg;
-	 private String buildVersion;
-	 private Map<String, String> mailDetails;
-	 private List<String> activeBranches;
+    private String msg;
+    private String buildVersion;
+    private Map<String, String> mailDetails;
+    private List<String> activeBranches;
 
 }

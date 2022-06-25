@@ -51,7 +51,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <image>andychentw/cloud-bank-config</image>
+                    <image>
+                        <name>andychentw/cloud-bank-config</name>
+                    </image>
                 </configuration>
             </plugin>
         </plugins>
