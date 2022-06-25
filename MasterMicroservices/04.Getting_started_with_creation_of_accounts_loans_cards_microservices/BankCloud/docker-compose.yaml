@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  configServer:
+    image: andychentw/bank-config:latest
+    ports:
+      - 8087:8888
+    networks:
+      - bank-net
+
+  accounts:
+    image: andychentw/accounts:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - configServer
+    networks:
+      - bank-net
+    environment:
+      - spring.profiles.active=prod
+      - spring.config.import=configserver:http://configServer:8888
+    restart: "on-failure"
+  cards:
+    image: andychentw/cards:latest
+    ports:
+      - 9000:9000
+    depends_on:
+      - configServer
+    networks:
+      - bank-net
+    environment:
+      - spring.profiles.active=prod
+      - spring.config.import=configserver:http://configServer:8888
+    restart: "on-failure"
+  loans:
+    image: andychentw/loans:latest
+    ports:
+      - 8090:8090
+    depends_on:
+      - configServer
+    networks:
+      - bank-net
+    environment:
+      - spring.profiles.active=prod
+      - spring.config.import=configserver:http://configServer:8888
+    restart: "on-failure"
+
+networks:
+  bank-net:

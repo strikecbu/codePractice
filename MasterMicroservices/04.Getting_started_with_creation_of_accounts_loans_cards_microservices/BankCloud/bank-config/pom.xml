@@ -52,7 +52,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <image>
-                        <name>andychentw/cloud-bank-config</name>
+                        <name>andychentw/${project.artifactId}</name>
                     </image>
                 </configuration>
             </plugin>

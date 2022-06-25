@@ -75,6 +75,11 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>${project.parent.version}</version>
+				<configuration>
+					<image>
+						<name>andychentw/${project.artifactId}</name>
+					</image>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
