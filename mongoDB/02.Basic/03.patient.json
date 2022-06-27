@@ -1,0 +1,29 @@
+[
+  {
+    "firstName": "Andy",
+    "lastName": "Chen",
+    "age": 29,
+    "history": [
+      { "disease": "cold", "treatment": "pill" },
+      { "disease": "fever", "treatment": "doctor touch" }
+    ]
+  },
+  {
+    "firstName": "Bella",
+    "lastName": "Wu",
+    "age": 32,
+    "history": [
+      { "disease": "mc", "treatment": "hotdog" },
+      { "disease": "fever", "treatment": "doctor touch" }
+    ]
+  },
+  {
+    "firstName": "Cathy",
+    "lastName": "Chaung",
+    "age": 35,
+    "history": [
+      { "disease": "mc", "treatment": "hotdog" },
+      { "disease": "covid", "treatment": "sleep" }
+    ]
+  }
+]
