@@ -12,6 +12,7 @@
         <module>cards</module>
         <module>loans</module>
         <module>bank-config</module>
+        <module>eureka-server</module>
     </modules>
     <packaging>pom</packaging>
 
