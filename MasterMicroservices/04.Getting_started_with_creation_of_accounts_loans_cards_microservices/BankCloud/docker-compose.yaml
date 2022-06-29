@@ -4,7 +4,7 @@ services:
   configServer:
     image: andychentw/bank-config:latest
     ports:
-      - 8087:8888
+      - 8087:8010
     networks:
       - bank-net
 
@@ -18,7 +18,7 @@ services:
       - bank-net
     environment:
       - spring.profiles.active=prod
-      - spring.config.import=configserver:http://configServer:8888
+      - spring.config.import=configserver:http://configServer:8010
     restart: "on-failure"
   cards:
     image: andychentw/cards:latest
@@ -30,7 +30,7 @@ services:
       - bank-net
     environment:
       - spring.profiles.active=prod
-      - spring.config.import=configserver:http://configServer:8888
+      - spring.config.import=configserver:http://configServer:8010
     restart: "on-failure"
   loans:
     image: andychentw/loans:latest
@@ -42,7 +42,7 @@ services:
       - bank-net
     environment:
       - spring.profiles.active=prod
-      - spring.config.import=configserver:http://configServer:8888
+      - spring.config.import=configserver:http://configServer:8010
     restart: "on-failure"
 
 networks:
