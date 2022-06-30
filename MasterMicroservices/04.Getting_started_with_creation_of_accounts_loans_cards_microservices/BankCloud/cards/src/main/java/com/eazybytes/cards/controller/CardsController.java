@@ -6,6 +6,7 @@ package com.eazybytes.cards.controller;
 import java.util.Properties;
 
 import com.eazybytes.cards.config.ConfigProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import com.eazybytes.cards.model.Cards;
@@ -20,6 +21,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("cards")
+@Slf4j
 public class CardsController {
 
 	private final CardsRepository cardsRepository;
@@ -33,7 +35,8 @@ public class CardsController {
 
 	@GetMapping()
 	public Flux<Cards> getCardDetails(@RequestParam Integer custId) {
-		return cardsRepository.findByCustomerId(custId);
+		return cardsRepository.findByCustomerId(custId)
+				.log();
 	}
 
 	@GetMapping("/properties")

@@ -1,13 +1,16 @@
 package com.eazybytes.loans.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
+import java.time.LocalDate;
 
-@Getter @Setter @ToString
+@Data
 public class Customer {
 
-	private int customerId;
+    private Integer customerId;
+    private String name;
+    private String email;
+    private String mobileNumber;
+    private LocalDate createDt;
 
 }
