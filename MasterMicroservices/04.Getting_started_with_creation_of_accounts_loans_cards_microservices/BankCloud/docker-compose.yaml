@@ -24,7 +24,23 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-        
+#  eurekaServer1:
+#    image: andychentw/eureka-server
+#    ports:
+#      - "8012:8011"
+#    networks:
+#      - bank-net
+#    depends_on:
+#      - configServer
+#    environment:
+#      - spring.config.import=configserver:http://configServer:8010
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 3
+#        window: 120s
+
 
   accounts:
     image: andychentw/accounts:latest
@@ -65,6 +81,25 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+#  cards1:
+#    image: andychentw/cards:latest
+#    ports:
+#      - 9001:9000
+#    depends_on:
+#      - configServer
+#      - eurekaServer
+#    networks:
+#      - bank-net
+#    environment:
+#      - spring.profiles.active=dev
+#      - spring.config.import=configserver:http://configServer:8010
+#      - eureka.client.service-url.defaultZone=http://eurekaServer:8011/eureka,http://eurekaServer1:8011/eureka
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 3
+#        window: 120s
 
   postgresDB:
     image: postgres
