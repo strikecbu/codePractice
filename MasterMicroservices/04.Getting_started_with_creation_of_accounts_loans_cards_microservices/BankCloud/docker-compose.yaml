@@ -4,21 +4,35 @@ services:
   configServer:
     image: andychentw/bank-config:latest
     ports:
-      - 8087:8010
+      - "8010:8010"
     networks:
       - bank-net
+
+  eurekaServer:
+    image: andychentw/eureka-server
+    ports:
+      - "8011:8011"
+    networks:
+      - bank-net
+    depends_on:
+      - configServer
+    environment:
+      - spring.config.import=configserver:http://configServer:8010
+    restart: "on-failure"
 
   accounts:
     image: andychentw/accounts:latest
     ports:
-      - 8080:8080
+      - "8080:8080"
     depends_on:
       - configServer
+      - eurekaServer
     networks:
       - bank-net
     environment:
-      - spring.profiles.active=prod
+      - spring.profiles.active=dev
       - spring.config.import=configserver:http://configServer:8010
+      - eureka.client.service-url.defaultZone=http://eurekaServer:8011/eureka
     restart: "on-failure"
   cards:
     image: andychentw/cards:latest
@@ -26,23 +40,39 @@ services:
       - 9000:9000
     depends_on:
       - configServer
+      - eurekaServer
     networks:
       - bank-net
     environment:
-      - spring.profiles.active=prod
+      - spring.profiles.active=dev
       - spring.config.import=configserver:http://configServer:8010
+      - eureka.client.service-url.defaultZone=http://eurekaServer:8011/eureka
     restart: "on-failure"
+
+  postgresDB:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: p@ssw0rd
+      POSTGRES_DB: postgres
+    networks:
+      - bank-net
+
   loans:
     image: andychentw/loans:latest
     ports:
       - 8090:8090
     depends_on:
       - configServer
+      - eurekaServer
+      - postgresDB
     networks:
       - bank-net
     environment:
-      - spring.profiles.active=prod
+      - spring.profiles.active=dev
       - spring.config.import=configserver:http://configServer:8010
+      - eureka.client.service-url.defaultZone=http://eurekaServer:8011/eureka
+      - db.postgres.url=r2dbc:postgresql://postgresDB:5432
     restart: "on-failure"
 
 networks:
