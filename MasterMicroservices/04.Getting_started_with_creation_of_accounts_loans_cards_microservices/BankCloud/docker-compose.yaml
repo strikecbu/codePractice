@@ -18,7 +18,13 @@ services:
       - configServer
     environment:
       - spring.config.import=configserver:http://configServer:8010
-    restart: "on-failure"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+        
 
   accounts:
     image: andychentw/accounts:latest
@@ -33,7 +39,13 @@ services:
       - spring.profiles.active=dev
       - spring.config.import=configserver:http://configServer:8010
       - eureka.client.service-url.defaultZone=http://eurekaServer:8011/eureka
-    restart: "on-failure"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+        
   cards:
     image: andychentw/cards:latest
     ports:
@@ -47,7 +59,12 @@ services:
       - spring.profiles.active=dev
       - spring.config.import=configserver:http://configServer:8010
       - eureka.client.service-url.defaultZone=http://eurekaServer:8011/eureka
-    restart: "on-failure"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
   postgresDB:
     image: postgres
@@ -73,7 +90,13 @@ services:
       - spring.config.import=configserver:http://configServer:8010
       - eureka.client.service-url.defaultZone=http://eurekaServer:8011/eureka
       - db.postgres.url=r2dbc:postgresql://postgresDB:5432
-    restart: "on-failure"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+        
 
 networks:
   bank-net:
