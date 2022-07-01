@@ -15,7 +15,6 @@ public class LibraryEventHandler {
         return request.bodyToMono(LibraryEvent.class)
                 //TODO invoke kafka
                 .flatMap(event -> {
-                    event.setEventId("456");
                     return ServerResponse.created(URI.create("/libraryEvents"))
                             .bodyValue(event);
                 });
