@@ -15,9 +15,11 @@ public class RouterConfig {
     @Bean
     public RouterFunction<ServerResponse> libraryEventRoute(LibraryEventHandler handler) {
         return RouterFunctions.route()
-                .nest(path("/libraryEvents"), builder ->
+                .nest(path("/v1/libraryEvents"), builder ->
                         builder.POST("", handler::postEvent)
                                 .PUT("/{eventId}", handler::putEvent))
+                .nest(path("/v2/libraryEvents"), builder ->
+                        builder.POST("", handler::postEventReactive))
                 .build();
     }
 }
