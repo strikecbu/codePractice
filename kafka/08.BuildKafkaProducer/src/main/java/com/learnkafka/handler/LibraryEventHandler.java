@@ -67,10 +67,19 @@ public class LibraryEventHandler {
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
-                }).log();
+                })
+                .log();
 
         return kafkaSender.send(map)
                 .single()
+                .doOnNext(senderResult -> {
+                    RecordMetadata metadata = senderResult.recordMetadata();
+                    log.info("send success, key: {}, value: {}, topic: {}",
+                            senderResult.correlationMetadata()
+                                    .getEventId(),
+                            senderResult.correlationMetadata(),
+                            metadata.topic());
+                })
                 .flatMap(senderResult -> ServerResponse.created(URI.create("/libraryEvents"))
                         .bodyValue(senderResult.correlationMetadata()));
 
