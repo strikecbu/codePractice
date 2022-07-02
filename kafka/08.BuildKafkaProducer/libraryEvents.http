@@ -1,0 +1,28 @@
+###
+POST http://localhost:8080/v2/libraryEvents
+Content-Type: application/json
+
+{
+  "eventId": null,
+  "book"  :{
+    "id" : 123,
+    "name": "Elder Ring",
+    "authorName": "Andy"
+  }
+}
+
+### send event reginal
+POST http://localhost:8080/v1/libraryEvents
+Content-Type: application/json
+
+{
+  "eventId": null,
+  "book"  :{
+    "id" : 1233,
+    "name": "Elder Ring",
+    "authorName": "Andy"
+  }
+}
+
+###
+PUT http://localhost:8080/v1/libraryEvents/{{eventId}}
