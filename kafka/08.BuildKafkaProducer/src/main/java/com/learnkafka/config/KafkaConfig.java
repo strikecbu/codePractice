@@ -1,5 +1,6 @@
 package com.learnkafka.config;
 
+import lombok.Getter;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -13,9 +14,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@Getter
 public class KafkaConfig {
     @Value("${spring.kafka.producer.bootstrap-servers}")
     private String bootstrapServers;
+
+    @Value("${spring.kafka.template.default-topic}")
+    private String topic;
 
     @Bean
     public KafkaSender<Integer, String> kafkaSender() {
