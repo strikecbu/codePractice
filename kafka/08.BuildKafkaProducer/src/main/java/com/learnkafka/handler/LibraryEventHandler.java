@@ -51,7 +51,9 @@ public class LibraryEventHandler {
                     }
                     return ServerResponse.created(URI.create("/libraryEvents"))
                             .bodyValue(event);
-                });
+                })
+                .switchIfEmpty(ServerResponse.badRequest()
+                        .bodyValue("Not provide body"));
     }
 
     public Mono<ServerResponse> putEvent(ServerRequest request) {
