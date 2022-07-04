@@ -16,10 +16,10 @@ public class RouterConfig {
     public RouterFunction<ServerResponse> libraryEventRoute(LibraryEventHandler handler) {
         return RouterFunctions.route()
                 .nest(path("/v1/libraryEvents"), builder ->
-                        builder.POST("", handler::postEvent)
-                                .PUT("/{eventId}", handler::putEvent))
+                         builder.POST("", handler::postEvent))
                 .nest(path("/v2/libraryEvents"), builder ->
-                        builder.POST("", handler::postEventReactive))
+                        builder.POST("", handler::postEventReactive)
+                                .PUT("/{eventId}", handler::putEventReactive))
                 .build();
     }
 }

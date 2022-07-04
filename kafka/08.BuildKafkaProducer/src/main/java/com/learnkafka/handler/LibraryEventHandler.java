@@ -5,6 +5,7 @@ import com.learnkafka.domain.LibraryEvent;
 import com.learnkafka.producer.LibraryEventProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Validator;
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeoutException;
 
 @Component
 @Slf4j
-public class LibraryEventHandler extends ValidatorHandler<LibraryEvent>{
+public class LibraryEventHandler extends ValidatorHandler<LibraryEvent> {
 
 
     private final KafkaSender<Integer, String> kafkaSender;
@@ -68,13 +69,47 @@ public class LibraryEventHandler extends ValidatorHandler<LibraryEvent>{
                                 .bodyValue(Objects.requireNonNull(e.getReason())));
     }
 
-    public Mono<ServerResponse> putEvent(ServerRequest request) {
-        return Mono.empty();
+    public Mono<ServerResponse> putEventReactive(ServerRequest request) {
+        //TODO validate path variable
+
+        Mono<SenderRecord<Integer, String, LibraryEvent>> map = request.bodyToMono(LibraryEvent.class)
+                .doOnNext(this::validRequest)
+                .doOnNext(event -> {
+                    if (event.getEventId() == null) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Event id is null");
+                    }
+                })
+                .map(event -> {
+                    try {
+                        return producer.mapperSenderRecord(event);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .log();
+
+        return kafkaSender.send(map)
+                .single()
+                .doOnNext(senderResult -> {
+                    RecordMetadata metadata = senderResult.recordMetadata();
+                    log.info("send success, key: {}, value: {}, topic: {}, partition: {}",
+                            senderResult.correlationMetadata()
+                                    .getEventId(),
+                            senderResult.correlationMetadata(),
+                            metadata.topic(),
+                            metadata.partition());
+                })
+                .flatMap(senderResult -> ServerResponse.ok()
+                        .bodyValue(senderResult.correlationMetadata()))
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.badRequest()
+                                .bodyValue(Objects.requireNonNull(e.getReason())));
     }
 
     public Mono<ServerResponse> postEventReactive(ServerRequest request) {
 
         Mono<SenderRecord<Integer, String, LibraryEvent>> map = request.bodyToMono(LibraryEvent.class)
+                .doOnNext(this::validRequest)
                 .map(event -> {
                     try {
                         return producer.mapperSenderRecord(event);
@@ -95,7 +130,10 @@ public class LibraryEventHandler extends ValidatorHandler<LibraryEvent>{
                             metadata.topic());
                 })
                 .flatMap(senderResult -> ServerResponse.created(URI.create("/libraryEvents"))
-                        .bodyValue(senderResult.correlationMetadata()));
+                        .bodyValue(senderResult.correlationMetadata()))
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.badRequest()
+                                .bodyValue(Objects.requireNonNull(e.getReason())));
 
     }
 }

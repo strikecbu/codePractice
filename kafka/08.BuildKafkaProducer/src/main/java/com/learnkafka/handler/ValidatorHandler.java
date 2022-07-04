@@ -26,6 +26,8 @@ public abstract class ValidatorHandler<T> {
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorStrings);
+        if (errors.getAllErrors().size() > 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorStrings);
+        }
     }
 }

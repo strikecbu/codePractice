@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
@@ -20,7 +21,9 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -35,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         "spring.kafka.producer.bootstrap-servers=${spring.embedded.kafka.brokers}",
         "spring.kafka.admin.properties.bootstrap.servers=${spring.embedded.kafka.brokers}"
 })
+@AutoConfigureWebTestClient
 class LibraryEventHandlerTest {
 
     @Autowired
@@ -47,6 +51,9 @@ class LibraryEventHandlerTest {
 
     @Autowired
     private KafkaConfig config;
+
+    @Autowired
+    private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() {
@@ -100,5 +107,65 @@ class LibraryEventHandlerTest {
 
     @Test
     void postEventReactive() {
+        Book book = Book.builder()
+                .id(123)
+                .authorName("Andy")
+                .name("Elder Ring I")
+                .build();
+        LibraryEvent event = LibraryEvent.builder()
+                .eventId(null)
+                .book(book)
+                .build();
+
+        URI uri = UriComponentsBuilder.fromUriString("/v2/libraryEvents")
+                .build()
+                .toUri();
+        webTestClient.post()
+                .uri(uri)
+                .bodyValue(event)
+                .exchange()
+                .expectStatus()
+                .isCreated();
+    }
+
+    @Test
+    void putEventReactive() {
+        Book book = Book.builder()
+                .id(123)
+                .authorName("Andy")
+                .name("Elder Ring I")
+                .build();
+        LibraryEvent event = LibraryEvent.builder()
+                .eventId(1)
+                .book(book)
+                .build();
+
+        URI uri = UriComponentsBuilder.fromUriString("/v2/libraryEvents/${eventId}")
+                .build(event.getEventId());
+        webTestClient.put()
+                .uri(uri)
+                .bodyValue(event)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        int partition = KafkaTestUtils.getSingleRecord(consumer, config.getTopic(), 5000)
+                .partition();
+        System.out.println("First call partition is " + partition);
+
+        webTestClient.put()
+                .uri(uri)
+                .bodyValue(event)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        int partition1 = KafkaTestUtils.getSingleRecord(consumer, config.getTopic(), 5000)
+                .partition();
+        System.out.println("Second call partition is " + partition1);
+
+        assertEquals(partition, partition1);
+
+
     }
 }
