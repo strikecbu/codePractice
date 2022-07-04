@@ -14,3 +14,4 @@
 * SQL
 * vue
 * MicroservicesSpringCloud
+* Kafka with SpringBoot
