@@ -7,32 +7,41 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderRecord;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 @Component
 @Slf4j
-public class LibraryEventHandler {
+public class LibraryEventHandler extends ValidatorHandler<LibraryEvent>{
 
 
     private final KafkaSender<Integer, String> kafkaSender;
 
     private final LibraryEventProducer producer;
 
-    public LibraryEventHandler(KafkaSender<Integer, String> kafkaSender, LibraryEventProducer producer) {
+    private final Validator validator;
+
+    public LibraryEventHandler(KafkaSender<Integer, String> kafkaSender, LibraryEventProducer producer,
+                               Validator validator) {
+        super(validator);
         this.kafkaSender = kafkaSender;
         this.producer = producer;
+        this.validator = validator;
     }
 
     public Mono<ServerResponse> postEvent(ServerRequest request) {
         return request.bodyToMono(LibraryEvent.class)
+                .doOnNext(this::validRequest)
                 //TODO invoke kafka
                 .flatMap(event -> {
                     try {
@@ -53,7 +62,10 @@ public class LibraryEventHandler {
                             .bodyValue(event);
                 })
                 .switchIfEmpty(ServerResponse.badRequest()
-                        .bodyValue("Not provide body"));
+                        .bodyValue("Not provide body"))
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.badRequest()
+                                .bodyValue(Objects.requireNonNull(e.getReason())));
     }
 
     public Mono<ServerResponse> putEvent(ServerRequest request) {

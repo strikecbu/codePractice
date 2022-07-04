@@ -50,10 +50,10 @@ class LibraryEventHandlerTest {
 
     @BeforeEach
     void setUp() {
-
         Map<String, Object> map = new HashMap<>(KafkaTestUtils.consumerProps("group1", "true", broker));
-        DefaultKafkaConsumerFactory<Integer, String> consumerFactory = new DefaultKafkaConsumerFactory<>(map, new IntegerDeserializer(), new StringDeserializer());
-        consumer = consumerFactory.createConsumer();
+        consumer = new DefaultKafkaConsumerFactory<>(map,
+                new IntegerDeserializer(),
+                new StringDeserializer()).createConsumer();
         broker.consumeFromAllEmbeddedTopics(consumer);
     }
 

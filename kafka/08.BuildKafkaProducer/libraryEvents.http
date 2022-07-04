@@ -23,6 +23,16 @@ Content-Type: application/json
     "authorName": "Andy"
   }
 }
+### send event bad request
+POST http://localhost:8080/v1/libraryEvents
+Content-Type: application/json
+
+{
+  "eventId": null,
+  "book" :{
+    "authorName": "Andy"
+  }
+}
 
 ###
 PUT http://localhost:8080/v1/libraryEvents/{{eventId}}
