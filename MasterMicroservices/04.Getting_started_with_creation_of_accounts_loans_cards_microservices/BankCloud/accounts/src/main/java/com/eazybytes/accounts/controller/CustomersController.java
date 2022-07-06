@@ -9,7 +9,8 @@ import com.eazybytes.accounts.model.Loans;
 import com.eazybytes.accounts.repository.AccountsRepository;
 import com.eazybytes.accounts.repository.CustomerRepository;
 import com.eazybytes.accounts.view.CustomerView;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,8 @@ public class CustomersController {
     }
 
     @GetMapping("/{custId}")
-    @CircuitBreaker(name = "custDetailByCustId", fallbackMethod = "fallbackFindCustomerByIdWithoutCards")
+//    @CircuitBreaker(name = "custDetailByCustId", fallbackMethod = "fallbackFindCustomerByIdWithoutCards")
+    @Retry(name = "custDetailByCustId", fallbackMethod = "fallbackFindCustomerByIdWithoutCards")
     public ResponseEntity<CustomerView> findCustomerById(@PathVariable Integer custId) {
         Optional<Customer> optionalCustomer = custRepository.findById(custId);
         if (!optionalCustomer.isPresent()) {
@@ -60,7 +62,8 @@ public class CustomersController {
         return new ResponseEntity<>(build, HttpStatus.OK);
     }
 
-    private ResponseEntity<CustomerView> fallbackFindCustomerByIdWithoutCards(@PathVariable Integer custId, Throwable ex) {
+    private ResponseEntity<CustomerView> fallbackFindCustomerByIdWithoutCards(@PathVariable Integer custId,
+                                                                              Throwable ex) {
         log.info("Fallback method execute while Exception: {}", ex.getMessage());
         Optional<Customer> optionalCustomer = custRepository.findById(custId);
         if (!optionalCustomer.isPresent()) {
@@ -83,9 +86,19 @@ public class CustomersController {
 
 
     @GetMapping
-    public ResponseEntity<com.eazybytes.accounts.model.Customer> getCustomerById(@RequestParam Integer custId){
-        Optional<com.eazybytes.accounts.model.Customer> optionalCustomer = custRepository.findById(custId);
+    public ResponseEntity<Customer> getCustomerById(@RequestParam Integer custId) {
+        Optional<Customer> optionalCustomer = custRepository.findById(custId);
         return optionalCustomer.map(customer -> new ResponseEntity<>(customer, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("/hello")
+    @RateLimiter(name = "sayhello", fallbackMethod = "sayHelloFallback")
+    public ResponseEntity<String> sayHello() {
+        return new ResponseEntity<>("Hello, stay awhile and listen", HttpStatus.OK);
+    }
+
+    private ResponseEntity<String> sayHelloFallback(Throwable ex) {
+        return new ResponseEntity<>("Hi, stay awhile and listen", HttpStatus.OK);
     }
 }
