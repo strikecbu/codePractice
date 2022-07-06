@@ -2,9 +2,11 @@ package com.eazybytes.accounts.controller;
 
 import com.eazybytes.accounts.client.CardClient;
 import com.eazybytes.accounts.client.LoanClient;
+import com.eazybytes.accounts.model.Accounts;
 import com.eazybytes.accounts.model.Cards;
 import com.eazybytes.accounts.model.Customer;
 import com.eazybytes.accounts.model.Loans;
+import com.eazybytes.accounts.repository.AccountsRepository;
 import com.eazybytes.accounts.repository.CustomerRepository;
 import com.eazybytes.accounts.view.CustomerView;
 import org.springframework.http.HttpStatus;
@@ -19,22 +21,26 @@ import java.util.Optional;
 public class CustomersController {
 
     private final CustomerRepository custRepository;
+    private final AccountsRepository accountsRepository;
 
     private final CardClient cardClient;
     private final LoanClient loanClient;
 
-    public CustomersController(CustomerRepository custRepository, CardClient cardClient, LoanClient loanClient) {
+    public CustomersController(CustomerRepository custRepository, CardClient cardClient, LoanClient loanClient,
+                               AccountsRepository accountsRepository) {
         this.custRepository = custRepository;
         this.cardClient = cardClient;
         this.loanClient = loanClient;
+        this.accountsRepository = accountsRepository;
     }
 
     @GetMapping("/{custId}")
     public ResponseEntity<CustomerView> findCustomerById(@PathVariable Integer custId) {
-        Optional<com.eazybytes.accounts.model.Customer> optionalCustomer = custRepository.findById(custId);
+        Optional<Customer> optionalCustomer = custRepository.findById(custId);
         if (!optionalCustomer.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        Accounts account = accountsRepository.findByCustomerId(custId);
 
         List<Cards> cardsList = cardClient.getCardDetails(custId);
         List<Loans> loans = loanClient.getLoansByCustId(custId);
@@ -42,6 +48,7 @@ public class CustomersController {
         Customer customer = optionalCustomer.get();
         CustomerView build = CustomerView.builder()
                 .customer(customer)
+                .account(account)
                 .cards(cardsList)
                 .loans(loans)
                 .build();

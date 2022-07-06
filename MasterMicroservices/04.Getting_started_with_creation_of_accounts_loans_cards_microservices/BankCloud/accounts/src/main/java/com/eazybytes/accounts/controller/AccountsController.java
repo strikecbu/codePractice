@@ -16,7 +16,7 @@ import com.eazybytes.accounts.repository.AccountsRepository;
  */
 
 @RestController
-@RequestMapping("account")
+@RequestMapping("accounts")
 public class AccountsController {
 	
 	private final AccountsRepository accountsRepository;
