@@ -9,6 +9,8 @@ import com.eazybytes.accounts.model.Loans;
 import com.eazybytes.accounts.repository.AccountsRepository;
 import com.eazybytes.accounts.repository.CustomerRepository;
 import com.eazybytes.accounts.view.CustomerView;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("customers")
+@Slf4j
 public class CustomersController {
 
     private final CustomerRepository custRepository;
@@ -35,6 +38,7 @@ public class CustomersController {
     }
 
     @GetMapping("/{custId}")
+    @CircuitBreaker(name = "custDetailByCustId", fallbackMethod = "fallbackFindCustomerByIdWithoutCards")
     public ResponseEntity<CustomerView> findCustomerById(@PathVariable Integer custId) {
         Optional<Customer> optionalCustomer = custRepository.findById(custId);
         if (!optionalCustomer.isPresent()) {
@@ -55,6 +59,28 @@ public class CustomersController {
 
         return new ResponseEntity<>(build, HttpStatus.OK);
     }
+
+    private ResponseEntity<CustomerView> fallbackFindCustomerByIdWithoutCards(@PathVariable Integer custId, Throwable ex) {
+        log.info("Fallback method execute while Exception: {}", ex.getMessage());
+        Optional<Customer> optionalCustomer = custRepository.findById(custId);
+        if (!optionalCustomer.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Accounts account = accountsRepository.findByCustomerId(custId);
+
+        List<Loans> loans = loanClient.getLoansByCustId(custId);
+
+        Customer customer = optionalCustomer.get();
+        CustomerView build = CustomerView.builder()
+                .customer(customer)
+                .account(account)
+                .loans(loans)
+                .cards(null)
+                .build();
+
+        return new ResponseEntity<>(build, HttpStatus.OK);
+    }
+
 
     @GetMapping
     public ResponseEntity<com.eazybytes.accounts.model.Customer> getCustomerById(@RequestParam Integer custId){
