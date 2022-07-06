@@ -39,7 +39,7 @@ PUT http://localhost:8080/v2/libraryEvents/1
 Content-Type: application/json
 
 {
-  "eventId": 3,
+  "eventId": 1,
   "book"  :{
     "id" : 1233,
     "name": "Elder Ring",

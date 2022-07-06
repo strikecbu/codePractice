@@ -2,6 +2,7 @@ package com.learnkafka.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.learnkafka.domain.LibraryEvent;
+import com.learnkafka.domain.LibraryEventType;
 import com.learnkafka.producer.LibraryEventProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -81,6 +82,7 @@ public class LibraryEventHandler extends ValidatorHandler<LibraryEvent> {
                 })
                 .map(event -> {
                     try {
+                        event.setEventType(LibraryEventType.UPDATE);
                         return producer.mapperSenderRecord(event);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
@@ -112,6 +114,7 @@ public class LibraryEventHandler extends ValidatorHandler<LibraryEvent> {
                 .doOnNext(this::validRequest)
                 .map(event -> {
                     try {
+                        event.setEventType(LibraryEventType.NEW);
                         return producer.mapperSenderRecord(event);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
