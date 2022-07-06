@@ -33,7 +33,7 @@ public class LoansController {
 
 	@GetMapping()
 	public Flux<Loans> getLoansDetails(@RequestParam Integer custId) {
-		return loansRepository.findByCustomerIdOrderByStartDtDesc(custId);
+		return loansRepository.findByCustomerIdOrderByStartDtDesc(custId).log();
 	}
 
 	@GetMapping("/properties")

@@ -1,6 +1,8 @@
 package com.eazybytes.accounts.view;
 
 import com.eazybytes.accounts.model.Cards;
+import com.eazybytes.accounts.model.Customer;
+import com.eazybytes.accounts.model.Loans;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,8 +10,9 @@ import java.util.List;
 
 @Data
 @Builder
-public class Customer {
+public class CustomerView {
 
-    private com.eazybytes.accounts.model.Customer customer;
+    private Customer customer;
     private List<Cards> cards;
+    private List<Loans> loans;
 }
