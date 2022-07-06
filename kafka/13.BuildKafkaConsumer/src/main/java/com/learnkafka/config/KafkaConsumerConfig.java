@@ -21,16 +21,16 @@ public class KafkaConsumerConfig {
         this.properties = properties;
     }
 
-    @Bean
-    ConcurrentKafkaListenerContainerFactory<?, ?> kafkaListenerContainerFactory(
-            ConcurrentKafkaListenerContainerFactoryConfigurer configurer,
-            ObjectProvider<ConsumerFactory<Object, Object>> kafkaConsumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        configurer.configure(factory,
-                kafkaConsumerFactory.getIfAvailable(() -> new DefaultKafkaConsumerFactory<>(this.properties.buildConsumerProperties())));
-        factory.getContainerProperties()
-                .setAckMode(ContainerProperties.AckMode.MANUAL);
-        factory.setConcurrency(3);
-        return factory;
-    }
+//    @Bean
+//    ConcurrentKafkaListenerContainerFactory<?, ?> kafkaListenerContainerFactory(
+//            ConcurrentKafkaListenerContainerFactoryConfigurer configurer,
+//            ObjectProvider<ConsumerFactory<Object, Object>> kafkaConsumerFactory) {
+//        ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+//        configurer.configure(factory,
+//                kafkaConsumerFactory.getIfAvailable(() -> new DefaultKafkaConsumerFactory<>(this.properties.buildConsumerProperties())));
+//        factory.getContainerProperties()
+//                .setAckMode(ContainerProperties.AckMode.MANUAL);
+//        factory.setConcurrency(3);
+//        return factory;
+//    }
 }
