@@ -66,6 +66,7 @@ public class LibraryEventProducer {
 
     public ProducerRecord<Integer, String> mapperRecord(LibraryEvent event) throws JsonProcessingException {
         String libraryEvent = objectMapper.writeValueAsString(event);
+        log.info("produce event string: {}", libraryEvent);
         List<Header> headers = List.of(new RecordHeader("mySpecialKey",
                 "Hello".getBytes(StandardCharsets.UTF_8)));
         return new ProducerRecord<>(topicName,
