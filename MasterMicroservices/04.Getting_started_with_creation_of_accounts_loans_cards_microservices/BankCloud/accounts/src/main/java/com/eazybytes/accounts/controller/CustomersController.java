@@ -41,14 +41,15 @@ public class CustomersController {
     @GetMapping("/{custId}")
 //    @CircuitBreaker(name = "custDetailByCustId", fallbackMethod = "fallbackFindCustomerByIdWithoutCards")
     @Retry(name = "custDetailByCustId", fallbackMethod = "fallbackFindCustomerByIdWithoutCards")
-    public ResponseEntity<CustomerView> findCustomerById(@PathVariable Integer custId) {
+    public ResponseEntity<CustomerView> findCustomerById(@RequestHeader("cloudbank-correlation-key") String key,
+                                                         @PathVariable Integer custId) {
+
         Optional<Customer> optionalCustomer = custRepository.findById(custId);
         if (!optionalCustomer.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         Accounts account = accountsRepository.findByCustomerId(custId);
-
-        List<Cards> cardsList = cardClient.getCardDetails(custId);
+        List<Cards> cardsList = cardClient.getCardDetails(key + "_a", custId);
         List<Loans> loans = loanClient.getLoansByCustId(custId);
 
         Customer customer = optionalCustomer.get();
@@ -62,7 +63,8 @@ public class CustomersController {
         return new ResponseEntity<>(build, HttpStatus.OK);
     }
 
-    private ResponseEntity<CustomerView> fallbackFindCustomerByIdWithoutCards(@PathVariable Integer custId,
+    private ResponseEntity<CustomerView> fallbackFindCustomerByIdWithoutCards(@RequestHeader("cloudbank-correlation-key") String key,
+                                                                              @PathVariable Integer custId,
                                                                               Throwable ex) {
         log.info("Fallback method execute while Exception: {}", ex.getMessage());
         Optional<Customer> optionalCustomer = custRepository.findById(custId);
