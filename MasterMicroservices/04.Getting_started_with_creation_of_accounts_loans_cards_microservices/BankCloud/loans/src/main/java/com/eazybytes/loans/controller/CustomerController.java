@@ -3,10 +3,7 @@ package com.eazybytes.loans.controller;
 import com.eazybytes.loans.client.AccountClient;
 import com.eazybytes.loans.client.CardClient;
 import com.eazybytes.loans.model.CustomerView;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -22,9 +19,9 @@ public class CustomerController {
     }
 
     @GetMapping("/{custId}")
-    public Mono<CustomerView> getCustomerById(@PathVariable Integer custId) {
+    public Mono<CustomerView> getCustomerById(@RequestHeader("cloudbank-correlation-key") String key,  @PathVariable Integer custId) {
         return accountClient.getCustomerById(custId)
-                .flatMap(customer -> cardClient.getCardDetails(custId)
+                .flatMap(customer -> cardClient.getCardDetails(key, custId)
                         .collectList()
                         .map(cards -> new CustomerView(customer, cards)))
                 .log();
