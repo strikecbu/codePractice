@@ -10,6 +10,21 @@ spring:
           #設定成false就只會route有設定route的path
           enabled: true
           lower-case-service-id: false
+  zipkin:
+#    base-url: http://localhost:9411
+    sender:
+      type: rabbit
+    rabbitmq:
+      queue: zipkin
+  sleuth:
+    sampler:
+      probability: 1
+  rabbitmq:
+    host: localhost
+    port: 5672
+    stream:
+      username: guest
+      password: guest
 server:
   port: 8087
 
