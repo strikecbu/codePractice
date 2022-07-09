@@ -1,6 +1,42 @@
 version: '3.8'
 
 services:
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    mem_limit: 350m
+    expose:
+      - "5672"
+      - "15672"
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - bank-net
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+    # https://hub.docker.com/r/openzipkin/zipkin
+  zipkin:
+    image: openzipkin/zipkin
+    mem_limit: 512m
+    expose:
+      - "9411"
+    ports:
+      - "9411:9411"
+    networks:
+      - bank-net
+    environment:
+      - RABBIT_ADDRESSES=rabbitmq
+      - RABBIT_USER=guest
+      - RABBIT_PASSWORD=guest
+      - STORAGE_TYPE=mem
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
   configServer:
     image: andychentw/bank-config:latest
     ports:
