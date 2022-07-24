@@ -13,11 +13,11 @@ import static com.learnjava.util.CommonUtil.delay;
 import static com.learnjava.util.CommonUtil.stopWatch;
 import static com.learnjava.util.LoggerUtil.log;
 
-public class ForkJoinWithRecursive extends RecursiveTask<List<String>> {
+public class ForkJoinWithRecursive2 extends RecursiveTask<List<String>> {
 
     private List<String> inputList;
 
-    public ForkJoinWithRecursive(List<String> inputList) {
+    public ForkJoinWithRecursive2(List<String> inputList) {
         this.inputList = inputList;
     }
 
@@ -25,7 +25,7 @@ public class ForkJoinWithRecursive extends RecursiveTask<List<String>> {
 
         stopWatch.start();
         List<String> namesList = DataSet.namesList();
-        ForkJoinWithRecursive forkJoinWithRecursive = new ForkJoinWithRecursive(namesList);
+        ForkJoinWithRecursive2 forkJoinWithRecursive = new ForkJoinWithRecursive2(namesList);
         ForkJoinPool pool = new ForkJoinPool();
         List<String> resultList = pool.invoke(forkJoinWithRecursive);
         stopWatch.stop();
@@ -46,14 +46,15 @@ public class ForkJoinWithRecursive extends RecursiveTask<List<String>> {
             return List.of(addNameLengthTransform(inputList.get(0)));
         }
 
-        int middlePoint = inputList.size() / 2;
-        ForkJoinTask<List<String>> leftFork = new ForkJoinWithRecursive(inputList.subList(0, middlePoint)).fork();
-        inputList = inputList.subList(middlePoint, inputList.size());
-        List<String> rightResult = compute();
-        List<String> leftResult = leftFork.join();
+        ForkJoinTask<List<String>> fork = new ForkJoinWithRecursive2(List.of(inputList.get(0))).fork();
 
-        ArrayList<String> result = new ArrayList<>(leftResult);
-        result.addAll(rightResult);
+        inputList = inputList.subList(1, inputList.size());
+
+        List<String> list = compute();
+        List<String> firstEle = fork.join();
+
+        ArrayList<String> result = new ArrayList<>(firstEle);
+        result.addAll(list);
 
         return result;
     }
