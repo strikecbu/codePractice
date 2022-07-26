@@ -39,6 +39,6 @@ spec:
           #   path: /data2
           #   type: DirectoryOrCreate
           persistentVolumeClaim:
-            claimName: host-pvc
+            claimName: nfs-kafka-pvc
             
           
