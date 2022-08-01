@@ -10,6 +10,35 @@ import static com.learnjava.util.LoggerUtil.log;
 
 public class CompletableFutureHelloWorld {
 
+    private HelloWorldService hws;
+
+    public CompletableFutureHelloWorld(HelloWorldService hws) {
+        this.hws = hws;
+    }
+
+    public CompletableFuture<String> helloWorld() {
+        return CompletableFuture.supplyAsync(hws::helloWorld);
+    }
+
+    public CompletableFuture<String> combineAndApplyHelloWorld() {
+        CompletableFuture<String> helloFuture = CompletableFuture.supplyAsync(hws::hello);
+        CompletableFuture<String> worldFuture = CompletableFuture.supplyAsync(hws::world);
+        CompletableFuture<String> happyFuture = CompletableFuture.supplyAsync(() -> {
+            delay(1000);
+            return " Happy day!";
+        });
+        return helloFuture
+                .thenCombineAsync(worldFuture, (s, s2) -> s + s2)
+                .thenCombineAsync(happyFuture, (s, s2) -> s + s2)
+                .thenApply(String::toUpperCase);
+
+    }
+    public CompletableFuture<String> composeHelloWorld() {
+        CompletableFuture<String> helloFuture = CompletableFuture.supplyAsync(hws::hello);
+        return helloFuture
+                .thenCompose(hws::worldFuture);
+    }
+
     public static void main(String[] args) {
         HelloWorldService hws = new HelloWorldService();
         CompletableFuture.supplyAsync(hws::helloWorld)
