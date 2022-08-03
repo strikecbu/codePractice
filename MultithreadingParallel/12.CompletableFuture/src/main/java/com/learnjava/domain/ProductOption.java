@@ -14,4 +14,5 @@ public class ProductOption {
     private String size;
     private String  color;
     private double  price;
+    private Inventory inventory;
 }
