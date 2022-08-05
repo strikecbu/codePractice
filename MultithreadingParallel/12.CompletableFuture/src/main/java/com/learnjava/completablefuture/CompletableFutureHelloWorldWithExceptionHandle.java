@@ -57,10 +57,10 @@ public class CompletableFutureHelloWorldWithExceptionHandle {
             return " Happy day!";
         });
         return helloFuture
-//                .exceptionally(ex -> {
-//                    log("Exception happen: " + ex.getMessage());
-//                    return "";
-//                })
+                .exceptionally(ex -> {
+                    log("Exception happen: " + ex.getMessage());
+                    return "";
+                })
                 .thenCombine(worldFuture, (s, s2) -> s + s2)
                 .exceptionally(ex -> {
                     log("Exception after hello happen: " + ex.getMessage());
@@ -79,6 +79,7 @@ public class CompletableFutureHelloWorldWithExceptionHandle {
         CompletableFuture<String> worldFuture = CompletableFuture.supplyAsync(hws::world);
         CompletableFuture<String> happyFuture = CompletableFuture.supplyAsync(() -> {
             delay(1000);
+            log("inside happy");
             return " Happy day!";
         });
         return helloFuture
@@ -102,7 +103,7 @@ public class CompletableFutureHelloWorldWithExceptionHandle {
                     log("Exception after hello world happen: " + ex.getMessage());
                     return "";
                 })
-                .thenCombineAsync(happyFuture, (s, s2) -> s + s2)
+                .thenCombine(happyFuture, (s, s2) -> s + s2)
                 .thenApply(String::toUpperCase);
 
     }

@@ -27,6 +27,7 @@ public class HelloWorldService {
 
     public CompletableFuture<String> worldFuture(String input) {
         return CompletableFuture.supplyAsync(()->{
+            log("inside hello + world");
             delay(1000);
             return input+" world!";
         });

@@ -58,6 +58,11 @@ public class ProductServiceUsingCompletableFuture {
 
         CompletableFuture<ProductInfo> productInfoCompletableFuture =
                 CompletableFuture.supplyAsync(() -> productInfoService.retrieveProductInfo(productId))
+                        .whenComplete((productInfo, throwable) -> {
+                            if (throwable != null) {
+                                log("Exception occurred: " + throwable.getMessage());
+                            }
+                        })
                         .thenApply(productInfo -> {
                             List<ProductOption> optionList = updateProductInfo(productInfo);
                             productInfo.setProductOptions(optionList);
@@ -65,7 +70,14 @@ public class ProductServiceUsingCompletableFuture {
                         });
 
         CompletableFuture<Review> reviewCompletableFuture = CompletableFuture.supplyAsync(() -> reviewService.retrieveReviews(
-                productId));
+                productId))
+                .exceptionally(ex -> {
+                    log("Get review fail, exception: " + ex.getMessage());
+                    return Review.builder()
+                            .noOfReviews(0)
+                            .overallRating(0.0)
+                            .build();
+                });
 
         Product product = productInfoCompletableFuture.thenCombine(reviewCompletableFuture,
                         (productInfo, review) -> new Product(productId, productInfo, review))
@@ -82,6 +94,11 @@ public class ProductServiceUsingCompletableFuture {
                 .stream()
                 .map(productOption -> {
                     return CompletableFuture.supplyAsync(() -> inventoryService.retrieveInventory(productOption))
+                            .exceptionally(throwable -> {
+                                log("Something is going wrong! ex: " + throwable.getMessage());
+                                return Inventory.builder()
+                                        .count(1).build();
+                            })
                             .thenApply(inventory -> {
                                 productOption.setInventory(inventory);
                                 return productOption;

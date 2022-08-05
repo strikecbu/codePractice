@@ -57,4 +57,6 @@ class ProductServiceUsingCompletableFutureTest {
             assertNotNull(option.getInventory());
         });
     }
+
+
 }
