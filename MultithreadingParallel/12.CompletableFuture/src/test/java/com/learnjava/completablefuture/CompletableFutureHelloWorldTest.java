@@ -41,9 +41,29 @@ class CompletableFutureHelloWorldTest {
         timeTaken();
     }
     @Test
-    void combineAndApplyHelloWorld_threadPool() {
+    void combineAndApplyHelloWorld_log_async() {
+        startTimer();
+        futureHelloWorld.combineAndApplyHelloWorld_log_async()
+                .thenAccept(result -> {
+                    assertEquals("HELLO WORLD! HAPPY DAY!", result);
+                })
+                .join();
+        timeTaken();
+    }
+    @Test
+    void combineAndApplyHelloWorld_own_threadPool() {
         startTimer();
         futureHelloWorld.combineAndApplyHelloWorld_own_threadPool()
+                .thenAccept(result -> {
+                    assertEquals("HELLO WORLD! HAPPY DAY!", result);
+                })
+                .join();
+        timeTaken();
+    }
+    @Test
+    void combineAndApplyHelloWorld_own_threadPool_async() {
+        startTimer();
+        futureHelloWorld.combineAndApplyHelloWorld_own_threadPool_async()
                 .thenAccept(result -> {
                     assertEquals("HELLO WORLD! HAPPY DAY!", result);
                 })
