@@ -65,4 +65,14 @@ class MovieClientTest {
         timeTaken();
         assertEquals(7, movies.size());
     }
+    @RepeatedTest(10)
+    void retrieveMovies_allOf() {
+        startTimer();
+        List<Long> movieInfoIds = List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L );
+
+        var movies = movieClient.retrieveMovies_allOf(movieInfoIds);
+
+        timeTaken();
+        assertEquals(7, movies.size());
+    }
 }
