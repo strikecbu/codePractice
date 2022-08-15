@@ -1,5 +1,6 @@
 package com.learnkafka.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
@@ -14,8 +15,11 @@ import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.util.backoff.FixedBackOff;
 
+import java.util.List;
+
 @Configuration
 @EnableKafka
+@Slf4j
 public class KafkaConsumerConfig {
 
     private final KafkaProperties properties;
@@ -26,7 +30,16 @@ public class KafkaConsumerConfig {
 
     private DefaultErrorHandler commonErrorHandler() {
         FixedBackOff backOff = new FixedBackOff(1000L, 2);
-        return new DefaultErrorHandler(backOff);
+        DefaultErrorHandler errorHandler = new DefaultErrorHandler(backOff);
+        errorHandler.setRetryListeners((record, ex, deliveryAttempt) -> {
+            log.info("Error occurred, ex: {}, attempt: {}.", ex.getMessage(), deliveryAttempt);
+        });
+
+        List<Class<? extends Exception>> exList = List.of(IllegalArgumentException.class);
+//        exList.forEach(errorHandler::addNotRetryableExceptions);
+        exList.forEach(errorHandler::addRetryableExceptions);
+
+        return errorHandler;
     }
 
     @Bean

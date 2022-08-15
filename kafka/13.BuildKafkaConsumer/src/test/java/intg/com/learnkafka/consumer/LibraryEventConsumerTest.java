@@ -133,8 +133,8 @@ class LibraryEventConsumerTest {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         countDownLatch.await(5, TimeUnit.SECONDS);
 
-        verify(consumer, times(10)).consumer(isA(ConsumerRecord.class));
-        verify(service, times(10)).processEvent(isA(ConsumerRecord.class));
+        verify(consumer, times(3)).consumer(isA(ConsumerRecord.class));
+        verify(service, times(3)).processEvent(isA(ConsumerRecord.class));
 
     }
 }
