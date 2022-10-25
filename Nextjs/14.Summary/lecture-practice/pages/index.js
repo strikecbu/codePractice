@@ -16,14 +16,31 @@ const DUMMY_DATA = [
   },
 ];
 
-function MeetupListPage() {
-  const [loadMeetupData, setLoadMeetupData] = useState([]);
-  useEffect(() => {
-    //load from server 
-    setLoadMeetupData(DUMMY_DATA)
-  }, [])
-
-  return <MeetupList meetups={loadMeetupData} />;
+function MeetupListPage(props) {
+  return <MeetupList meetups={props.meetups} />;
 }
+
+// export const getServerSideProps = async (ctx) => {
+
+//   console.log("execute");
+
+//   return {
+//     props: {
+//       meetups: DUMMY_DATA,
+//     },
+//   }
+// }
+
+export const getStaticProps = async (ctx) => {
+  //load from server
+
+  console.log("execute");
+  return {
+    props: {
+      meetups: DUMMY_DATA,
+    },
+    revalidate: 60
+  };
+};
 
 export default MeetupListPage;
