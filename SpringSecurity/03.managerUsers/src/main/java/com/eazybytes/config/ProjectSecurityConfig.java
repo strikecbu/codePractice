@@ -17,10 +17,11 @@ public class ProjectSecurityConfig {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests()
+        http.csrf().disable()
+                .authorizeHttpRequests()
                 .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards")
                 .authenticated()
-                .requestMatchers("/notices", "/contact")
+                .requestMatchers("/notices", "/contact", "/register")
                 .permitAll()
                 .and()
                 .formLogin()
