@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CustomerUserDetailManager implements UserDetailsService {
+public class CustomerUserDetailService implements UserDetailsService {
 
     private final CustomerRepository customerRepository;
 
-    public CustomerUserDetailManager(CustomerRepository customerRepository) {
+    public CustomerUserDetailService(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
     }
 
