@@ -1,10 +1,11 @@
+drop database eazybank;
 create database eazybank;
-
+#
 use eazybank;
-
-drop table `users`;
-drop table `authorities`;
-drop table `customer`;
+#
+# drop table `users`;
+# drop table `authorities`;
+# drop table `customer`;
 
 CREATE TABLE `customer` (
   `customer_id` int NOT NULL AUTO_INCREMENT,
@@ -22,7 +23,7 @@ INSERT INTO `customer` (`name`,`email`,`mobile_number`, `pwd`, `role`,`create_dt
 
 CREATE TABLE `accounts` (
   `customer_id` int NOT NULL,
-   `account_number` int NOT NULL,
+   `account_number` bigint NOT NULL,
   `account_type` varchar(100) NOT NULL,
   `branch_address` varchar(200) NOT NULL,
   `create_dt` date DEFAULT NULL,
@@ -36,7 +37,7 @@ INSERT INTO `accounts` (`customer_id`, `account_number`, `account_type`, `branch
 
 CREATE TABLE `account_transactions` (
   `transaction_id` varchar(200) NOT NULL,
-  `account_number` int NOT NULL,
+  `account_number` bigint NOT NULL,
   `customer_id` int NOT NULL,
   `transaction_dt` date NOT NULL,
   `transaction_summary` varchar(200) NOT NULL,
